@@ -6,7 +6,7 @@ import busio
 import adafruit_lsm9ds1
 
 #I@C Connection:
-i2c = busio,I2C(board.SCL, board.SDA)
+i2c = busio.I2C(board.SCL, board.SDA)
 sensor = adafruit_lsm9ds1.LSM9DS1_I2C(i2c)
 
 var = 1
