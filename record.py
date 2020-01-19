@@ -7,7 +7,7 @@ import datetime as dt
 
 var = 1
 
-while var == 1:
+while true:
 	camera = picamera.PiCamera()
 	try:
 		print()
