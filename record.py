@@ -1,17 +1,9 @@
-<<<<<<< HEAD
-
-=======
-import picamera, os, time
+import picamera
 from time import sleep
-import datetime as dt
-
-var = 1
-
+camera = picamera.PiCamera()
 while true:
-	camera = picamera.PiCamera()
-	try:
-		print()
-		fileTime = str(time.time())
-		fileName = "video.h264"
-		print("Newest File Is: " + fileTime)
->>>>>>> 8b389f3e6c7640a380f0836c3121d1d51df1d0f1
+	camera.start_preview()
+	camera.start_recording(‘recorded.h264’)
+	camera.wait_recording(10)
+	camera.stop_recording()
+	camera.stop_preview()
