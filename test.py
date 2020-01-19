@@ -3,7 +3,7 @@ import time
 import board
 import busio
 import adafruit_lsm9ds1
-
+from PIL import Image
 
 # I2C connection:
 i2c = busio.I2C(board.SCL, board.SDA)
@@ -12,6 +12,13 @@ sensor = adafruit_lsm9ds1.LSM9DS1_I2C(i2c)
 camera = picamera.PiCamera()
 camera.resolution = (640, 480)
 camera.start_recording('my_video.h264')
+
+img = Image.open('overlay.png')
+pad = Image.new('RGB', (((img.size[0] + 31) // 32) * 32, ((img.size[1] + 15) // 16) * 16,))
+pad.paste(img, (0, 0))
+o = camera.add_overlay(pad.tobytes(), size = img.size)
+o.alpha = 128
+o.layer = 3
 
 while True:
 
