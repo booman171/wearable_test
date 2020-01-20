@@ -31,4 +31,4 @@ while True:
     print('Temperature: {0:0.3f}C'.format(temp))
     # Delay for a second.
     time.sleep(1.0)
-  camera.stop_recording()
+#  camera.stop_recording()
