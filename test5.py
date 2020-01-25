@@ -12,7 +12,11 @@ import board
 import busio
 import adafruit_sgp30
 import adafruit_lsm9ds1
+import csv
 
+
+f = open("accel.csv", "w", newline="")
+c=csv.writer(f)
 xyz = 5
 x = 0
 y = 0
@@ -52,6 +56,7 @@ while(True):
     gyro_x, gyro_y, gyro_z = sensor.gyro
     temp = sensor.temperature
 
+    c.writerow([accel_x])
     # Print values.
     print('Acceleration (m/s^2): ({0:0.3f},{1:0.3f},{2:0.3f})'.format(accel_x, accel_y, accel_z))
     print('Magnetometer (gauss): ({0:0.3f},{1:0.3f},{2:0.3f})'.format(mag_x, mag_y, mag_z))
@@ -75,3 +80,4 @@ while(True):
     if cv2.waitKey(20) & 0xFF == ord('q'):
         break
     
+f.close()
