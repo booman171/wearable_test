@@ -23,10 +23,12 @@ c=csv.writer(f)
 
 start = time.monotonic()
 
+logo = cv2.imread('compass_letters.png', -1)
+watermark = image_resize(logo, height=100)
+watermark = cv2.cvtColor(watermark, cv2.COLOR_BGR2BGRA)
 
-
-point = cv2.imread('images/compass0.png', -1)
-compass = image_resize(logo, height=100)
+point = cv2.imread('compass_point.png', -1)
+compass = image_resize(point, height=100)
 compass = cv2.cvtColor(compass, cv2.COLOR_BGR2BGRA)
 
 xyz = 5
@@ -65,7 +67,16 @@ while(True):
     frame_h, frame_w, frame_c = frame.shape
     # overlay with 4 channels BGR and Alpha
     overlay = np.zeros((frame_h, frame_w, 4), dtype='uint8')
-  
+    
+    watermark_h, watermark_w, watermark_c = watermark.shape
+    # replace overlay pixels with watermark pixel values
+    for i in range(0, watermark_h):
+        for j in range(0, watermark_w):
+            if watermark[i,j][3] != 0:
+                offset = 10
+                h_offset = frame_h - watermark_h - offset
+                w_offset = frame_w - watermark_w - offset
+                overlay[i, w_offset+ j] = watermark[i,j]
 
     compass_h, compass_w, compass_c = compass.shape
     # replace overlay pixels with compass pixel values
