@@ -79,8 +79,8 @@ while(True):
 #    print('Heading Angle: ({0:0.3f})'.format(angle))
 #    
 #    # Capture frame-by-frame
-#    ret, frame = cap.read()
-#    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2BGRA)
+    ret, frame = cap.read()
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2BGRA)
 #    frame_h, frame_w, frame_c = frame.shape
 #    # overlay with 4 channels BGR and Alpha
 #    overlay = np.zeros((frame_h, frame_w, 4), dtype='uint8')
