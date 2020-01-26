@@ -79,37 +79,37 @@ while(True):
     # Print values.
     print('Heading Angle: ({0:0.3f})'.format(angle))
     
-    # Capture frame-by-frame
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2BGRA)
-    frame_h, frame_w, frame_c = frame.shape
-    # overlay with 4 channels BGR and Alpha
-    overlay = np.zeros((frame_h, frame_w, 4), dtype='uint8')
-    
-    watermark_h, watermark_w, watermark_c = watermark.shape
-    # replace overlay pixels with watermark pixel values
-    for i in range(0, watermark_h):
-        for j in range(0, watermark_w):
-            if watermark[i,j][3] != 0:
-                offset = 10
-                h_offset = frame_h - watermark_h - offset
-                w_offset = frame_w - watermark_w - offset
-                overlay[i, w_offset+ j] = watermark[i,j]
-
-    
-    compass = image_resize(compass, height=100)
-    compass = cv2.cvtColor(compass, cv2.COLOR_BGR2BGRA)
-    compass_h, compass_w, compass_c = compass.shape
-    # replace overlay pixels with compass pixel values
-    for i in range(0, compass_h):
-        for j in range(0, compass_w):
-            if compass[i,j][3] != 0:
-                offset = 10
-                h_offset = frame_h - compass_h - offset
-                w_offset = frame_w - compass_w - offset
-                overlay[i, w_offset+ j] = compass[i,j]
-                
-    cv2.addWeighted(overlay, 1.00, frame, 1.0, 0, frame)
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
+#     # Capture frame-by-frame
+#     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2BGRA)
+#     frame_h, frame_w, frame_c = frame.shape
+#     # overlay with 4 channels BGR and Alpha
+#     overlay = np.zeros((frame_h, frame_w, 4), dtype='uint8')
+#     
+#     watermark_h, watermark_w, watermark_c = watermark.shape
+#     # replace overlay pixels with watermark pixel values
+#     for i in range(0, watermark_h):
+#         for j in range(0, watermark_w):
+#             if watermark[i,j][3] != 0:
+#                 offset = 10
+#                 h_offset = frame_h - watermark_h - offset
+#                 w_offset = frame_w - watermark_w - offset
+#                 overlay[i, w_offset+ j] = watermark[i,j]
+# 
+#     
+#     compass = image_resize(compass, height=100)
+#     compass = cv2.cvtColor(compass, cv2.COLOR_BGR2BGRA)
+#     compass_h, compass_w, compass_c = compass.shape
+#     # replace overlay pixels with compass pixel values
+#     for i in range(0, compass_h):
+#         for j in range(0, compass_w):
+#             if compass[i,j][3] != 0:
+#                 offset = 10
+#                 h_offset = frame_h - compass_h - offset
+#                 w_offset = frame_w - compass_w - offset
+#                 overlay[i, w_offset+ j] = compass[i,j]
+#                 
+#     cv2.addWeighted(overlay, 1.00, frame, 1.0, 0, frame)
+#     frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
     
     
     #print('Acceleration (m/s^2): ({0:0.3f},{1:0.3f},{2:0.3f})'.format(accel_x, accel_y, accel_z))
@@ -122,7 +122,7 @@ while(True):
     #print("eCO2 = %d ppm \t TVOC = %d ppb" % (sgp30.eCO2, sgp30.TVOC))
     
     cv2.putText(frame,now.strftime("%H:%M:%S"),(30,50),cv2.FONT_HERSHEY_SIMPLEX,1,(51, 51, 0),2,cv2.LINE_AA)
-    #cv2.putText(frame,str(sgp30.eCO2),(30,90),cv2.FONT_HERSHEY_SIMPLEX,1,(51, 51, 0),2,cv2.LINE_AA)
+    cv2.putText(frame,str(round(angle, 1)),(500,50),cv2.FONT_HERSHEY_SIMPLEX,1,(51, 51, 0),2,cv2.LINE_AA)
     #print("eCO2 = %d ppm \t TVOC = %d ppb" % (sgp30.eCO2, sgp30.TVOC))
     #time.sleep(1)
     #elapsed_sec += 1
@@ -131,7 +131,7 @@ while(True):
     #cv2.imshow('frame',frame)
     
     
-    if cv2.waitKey(20) & 0xFF == ord('q'):
+    if cv2.waitKey(100) & 0xFF == ord('q'):
         break
     
 f.close()
