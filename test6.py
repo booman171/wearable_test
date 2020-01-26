@@ -68,49 +68,49 @@ while(True):
     now = datetime.now()
     c.writerow([time.monotonic(), accel_x, accel_y, accel_z, temp])
     
-    heading = math.atan2(float(mag_y),float(mag_z)) + declination
-    if heading > 2*math.pi:
-        heading = heading - 2*math.pi
-    if heading < 0:
-        heading = heading + 2*math.pi
-    angle = (heading* 180 / math.pi)
-    compass = imutils.rotate(point, angle)
-    # Print values.
-    print('Heading Angle: ({0:0.3f})'.format(angle))
-    
-    # Capture frame-by-frame
-    ret, frame = cap.read()
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2BGRA)
-    frame_h, frame_w, frame_c = frame.shape
-    # overlay with 4 channels BGR and Alpha
-    overlay = np.zeros((frame_h, frame_w, 4), dtype='uint8')
-    
-    watermark_h, watermark_w, watermark_c = watermark.shape
-    # replace overlay pixels with watermark pixel values
-    for i in range(0, watermark_h):
-        for j in range(0, watermark_w):
-            if watermark[i,j][3] != 0:
-                offset = 10
-                h_offset = frame_h - watermark_h - offset
-                w_offset = frame_w - watermark_w - offset
-                overlay[i, w_offset+ j] = watermark[i,j]
-
-    
-    compass = image_resize(compass, height=100)
-    compass = cv2.cvtColor(compass, cv2.COLOR_BGR2BGRA)
-    compass_h, compass_w, compass_c = compass.shape
-    # replace overlay pixels with compass pixel values
-    for i in range(0, compass_h):
-        for j in range(0, compass_w):
-            if compass[i,j][3] != 0:
-                offset = 10
-                h_offset = frame_h - compass_h - offset
-                w_offset = frame_w - compass_w - offset
-                overlay[i, w_offset+ j] = compass[i,j]
-                
-    cv2.addWeighted(overlay, 1.00, frame, 1.0, 0, frame)
-
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
+#    heading = math.atan2(float(mag_y),float(mag_z)) + declination
+#    if heading > 2*math.pi:
+#        heading = heading - 2*math.pi
+#    if heading < 0:
+#        heading = heading + 2*math.pi
+#    angle = (heading* 180 / math.pi)
+#    compass = imutils.rotate(point, angle)
+#    # Print values.
+#    print('Heading Angle: ({0:0.3f})'.format(angle))
+#    
+#    # Capture frame-by-frame
+#    ret, frame = cap.read()
+#    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2BGRA)
+#    frame_h, frame_w, frame_c = frame.shape
+#    # overlay with 4 channels BGR and Alpha
+#    overlay = np.zeros((frame_h, frame_w, 4), dtype='uint8')
+#    
+#    watermark_h, watermark_w, watermark_c = watermark.shape
+#    # replace overlay pixels with watermark pixel values
+#    for i in range(0, watermark_h):
+#        for j in range(0, watermark_w):
+#            if watermark[i,j][3] != 0:
+#                offset = 10
+#                h_offset = frame_h - watermark_h - offset
+#                w_offset = frame_w - watermark_w - offset
+#                overlay[i, w_offset+ j] = watermark[i,j]
+#
+#    
+#    compass = image_resize(compass, height=100)
+#    compass = cv2.cvtColor(compass, cv2.COLOR_BGR2BGRA)
+#    compass_h, compass_w, compass_c = compass.shape
+#    # replace overlay pixels with compass pixel values
+#    for i in range(0, compass_h):
+#        for j in range(0, compass_w):
+#            if compass[i,j][3] != 0:
+#                offset = 10
+#                h_offset = frame_h - compass_h - offset
+#                w_offset = frame_w - compass_w - offset
+#                overlay[i, w_offset+ j] = compass[i,j]
+#                
+#    cv2.addWeighted(overlay, 1.00, frame, 1.0, 0, frame)
+#
+#    frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
     
     
     #print('Acceleration (m/s^2): ({0:0.3f},{1:0.3f},{2:0.3f})'.format(accel_x, accel_y, accel_z))
