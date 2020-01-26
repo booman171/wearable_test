@@ -36,7 +36,7 @@ y = 0
 z = 0
 declination = -0.106988683
 filename = 'video.avi' # .avi .mp4
-frames_per_seconds = 10.0
+frames_per_seconds = 7.0
 my_res = (640, 480) #'480p' # 1080p
 
 
@@ -126,7 +126,7 @@ while(True):
     #cv2.putText(frame,str(sgp30.eCO2),(30,90),cv2.FONT_HERSHEY_SIMPLEX,1,(51, 51, 0),2,cv2.LINE_AA)
     #print("eCO2 = %d ppm \t TVOC = %d ppb" % (sgp30.eCO2, sgp30.TVOC))
     #time.sleep(1)
-    elapsed_sec += 1
+    #elapsed_sec += 1
     out.write(frame)
     # Display the resulting frame
     #cv2.imshow('frame',frame)
