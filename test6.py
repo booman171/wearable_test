@@ -60,6 +60,7 @@ sensor = adafruit_lsm9ds1.LSM9DS1_I2C(i2c)
 elapsed_sec = 0
 
 while(True):
+    ret, frame = cap.read()
     # Read acceleration, magnetometer, gyroscope, temperature.
     accel_x, accel_y, accel_z = sensor.acceleration
     mag_x, mag_y, mag_z = sensor.magnetic
@@ -79,7 +80,6 @@ while(True):
     print('Heading Angle: ({0:0.3f})'.format(angle))
     
     # Capture frame-by-frame
-    ret, frame = cap.read()
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2BGRA)
     frame_h, frame_w, frame_c = frame.shape
     # overlay with 4 channels BGR and Alpha
@@ -131,7 +131,7 @@ while(True):
     #cv2.imshow('frame',frame)
     
     
-    if cv2.waitKey(100) & 0xFF == ord('q'):
+    if cv2.waitKey(20) & 0xFF == ord('q'):
         break
     
 f.close()
