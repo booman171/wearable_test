@@ -104,7 +104,11 @@ while(True):
     if heading > 2*math.pi:
 	heading = heading - 2*math.pi
     if heading < 0:
+<<<<<<< HEAD
 	heading = heading + 2*math.pi
+=======
+        heading = heading + 2*math.pi
+>>>>>>> a72b2545be8d96281897a651a994c0756e315344
     angle = (heading* 180 / math.pi)
     
     # Print values.
