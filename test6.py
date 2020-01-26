@@ -79,7 +79,6 @@ while(True):
     point = cv2.imread('images/compass_point.png', -1)
     compass = image_resize(point, height=100)
     compass = cv2.cvtColor(compass, cv2.COLOR_BGR2BGRA)
-    
     compass_h, compass_w, compass_c = compass.shape
     # replace overlay pixels with compass pixel values
     for i in range(0, compass_h):
@@ -117,7 +116,7 @@ while(True):
         heading = heading + 2*math.pi
 >>>>>>> a72b2545be8d96281897a651a994c0756e315344
     angle = (heading* 180 / math.pi)
-    
+    compass = imutils.rotate(compass, angle)
     # Print values.
     print('Heading Angle: ({0:0.3f})'.format(angle))
     #print('Acceleration (m/s^2): ({0:0.3f},{1:0.3f},{2:0.3f})'.format(accel_x, accel_y, accel_z))
