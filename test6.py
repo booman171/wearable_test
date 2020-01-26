@@ -35,7 +35,7 @@ xyz = 5
 x = 0
 y = 0
 z = 0
-
+declination = -0.106988683
 filename = 'video.avi' # .avi .mp4
 frames_per_seconds = 24.0
 my_res = (640, 480) #'480p' # 1080p
@@ -99,11 +99,20 @@ while(True):
     temp = sensor.temperature
     now = datetime.now()
     c.writerow([time.monotonic(), accel_x, accel_y, accel_z, temp])
+    
+    heading = math.atan2(float(mag_y),float(mag_x)) + declination
+    if heading > 2*math.pi:
+        heading = heading - 2*math.pi
+    if heading < 0:
+    heading = heading + 2*math.pi
+    angle = (heading* 180 / math.pi)
+    
     # Print values.
-    print('Acceleration (m/s^2): ({0:0.3f},{1:0.3f},{2:0.3f})'.format(accel_x, accel_y, accel_z))
-    print('Magnetometer (gauss): ({0:0.3f},{1:0.3f},{2:0.3f})'.format(mag_x, mag_y, mag_z))
-    print('Gyroscope (degrees/sec): ({0:0.3f},{1:0.3f},{2:0.3f})'.format(gyro_x, gyro_y, gyro_z))
-    print('Temperature: {0:0.3f}C'.format(temp))
+    print('Heading Angle: ({0:0.3f})'.format(angle))
+    #print('Acceleration (m/s^2): ({0:0.3f},{1:0.3f},{2:0.3f})'.format(accel_x, accel_y, accel_z))
+    #print('Magnetometer (gauss): ({0:0.3f},{1:0.3f},{2:0.3f})'.format(mag_x, mag_y, mag_z))
+    #print('Gyroscope (degrees/sec): ({0:0.3f},{1:0.3f},{2:0.3f})'.format(gyro_x, gyro_y, gyro_z))
+    #print('Temperature: {0:0.3f}C'.format(temp))
     
     # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     # Draw framerate in corner of frame
