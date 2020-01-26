@@ -15,7 +15,8 @@ import adafruit_lsm9ds1
 import csv
 from datetime import datetime
 from utils import CFEVideoConf, image_resize
-
+import math
+import imutils
 
 
 f = open("accel.csv", "w", newline="")
@@ -27,7 +28,7 @@ logo = cv2.imread('images/compass_letters.png', -1)
 watermark = image_resize(logo, height=100)
 watermark = cv2.cvtColor(watermark, cv2.COLOR_BGR2BGRA)
 
-
+point = cv2.imread('images/compass_point.png', -1)
 
 xyz = 5
 x = 0
@@ -59,6 +60,24 @@ sensor = adafruit_lsm9ds1.LSM9DS1_I2C(i2c)
 elapsed_sec = 0
 
 while(True):
+    # Read acceleration, magnetometer, gyroscope, temperature.
+    accel_x, accel_y, accel_z = sensor.acceleration
+    mag_x, mag_y, mag_z = sensor.magnetic
+    gyro_x, gyro_y, gyro_z = sensor.gyro
+    temp = sensor.temperature
+    now = datetime.now()
+    c.writerow([time.monotonic(), accel_x, accel_y, accel_z, temp])
+    
+    heading = math.atan2(float(mag_y),float(mag_z)) + declination
+    if heading > 2*math.pi:
+        heading = heading - 2*math.pi
+    if heading < 0:
+        heading = heading + 2*math.pi
+    angle = (heading* 180 / math.pi)
+    compass = imutils.rotate(point, angle)
+    # Print values.
+    print('Heading Angle: ({0:0.3f})'.format(angle))
+    
     # Capture frame-by-frame
     ret, frame = cap.read()
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2BGRA)
@@ -76,8 +95,8 @@ while(True):
                 w_offset = frame_w - watermark_w - offset
                 overlay[i, w_offset+ j] = watermark[i,j]
 
-    point = cv2.imread('images/compass_point.png', -1)
-    compass = image_resize(point, height=100)
+    
+    compass = image_resize(compass, height=100)
     compass = cv2.cvtColor(compass, cv2.COLOR_BGR2BGRA)
     compass_h, compass_w, compass_c = compass.shape
     # replace overlay pixels with compass pixel values
@@ -89,36 +108,11 @@ while(True):
                 w_offset = frame_w - compass_w - offset
                 overlay[i, w_offset+ j] = compass[i,j]
                 
-    cv2.addWeighted(overlay, 0.25, frame, 1.0, 0, frame)
+    cv2.addWeighted(overlay, 1.00, frame, 1.0, 0, frame)
 
     frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
     
-    # Read acceleration, magnetometer, gyroscope, temperature.
-    accel_x, accel_y, accel_z = sensor.acceleration
-    mag_x, mag_y, mag_z = sensor.magnetic
-    gyro_x, gyro_y, gyro_z = sensor.gyro
-    temp = sensor.temperature
-    now = datetime.now()
-    c.writerow([time.monotonic(), accel_x, accel_y, accel_z, temp])
     
-    heading = math.atan2(float(mag_y),float(mag_z)) + declination
-    if heading > 2*math.pi:
-<<<<<<< HEAD
-	heading = heading - 2*math.pi
-=======
-        heading = heading - 2*math.pi
-        
->>>>>>> 542a3006ea7e2ebfe51612d880da1c4d96dfd8f3
-    if heading < 0:
-<<<<<<< HEAD
-	heading = heading + 2*math.pi
-=======
-        heading = heading + 2*math.pi
->>>>>>> a72b2545be8d96281897a651a994c0756e315344
-    angle = (heading* 180 / math.pi)
-    compass = imutils.rotate(compass, angle)
-    # Print values.
-    print('Heading Angle: ({0:0.3f})'.format(angle))
     #print('Acceleration (m/s^2): ({0:0.3f},{1:0.3f},{2:0.3f})'.format(accel_x, accel_y, accel_z))
     #print('Magnetometer (gauss): ({0:0.3f},{1:0.3f},{2:0.3f})'.format(mag_x, mag_y, mag_z))
     #print('Gyroscope (degrees/sec): ({0:0.3f},{1:0.3f},{2:0.3f})'.format(gyro_x, gyro_y, gyro_z))
@@ -128,7 +122,7 @@ while(True):
     # Draw framerate in corner of frame
     #print("eCO2 = %d ppm \t TVOC = %d ppb" % (sgp30.eCO2, sgp30.TVOC))
     
-    #cv2.putText(frame,now.strftime("%H:%M:%S"),(30,50),cv2.FONT_HERSHEY_SIMPLEX,1,(51, 51, 0),2,cv2.LINE_AA)
+    cv2.putText(frame,now.strftime("%H:%M:%S"),(30,50),cv2.FONT_HERSHEY_SIMPLEX,1,(51, 51, 0),2,cv2.LINE_AA)
     #cv2.putText(frame,str(sgp30.eCO2),(30,90),cv2.FONT_HERSHEY_SIMPLEX,1,(51, 51, 0),2,cv2.LINE_AA)
     #print("eCO2 = %d ppm \t TVOC = %d ppb" % (sgp30.eCO2, sgp30.TVOC))
     #time.sleep(1)
