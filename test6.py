@@ -36,7 +36,7 @@ y = 0
 z = 0
 declination = -0.106988683
 filename = 'video.avi' # .avi .mp4
-frames_per_seconds = 7.0
+frames_per_seconds = 30.0
 my_res = (640, 480) #'480p' # 1080p
 
 
@@ -45,7 +45,7 @@ cap = cv2.VideoCapture(0)
 video_type_cv2 = cv2.VideoWriter_fourcc(*'XVID')
 save_path = os.path.join(filename)
 
-out = cv2.VideoWriter('video.avi', video_type_cv2, frames_per_seconds, my_res)
+out = cv2.VideoWriter('video.avi', video_type_cv2,frames_per_seconds,  my_res)
 
 # I2C connection:
 i2c = busio.I2C(board.SCL, board.SDA, frequency=100000)
