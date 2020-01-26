@@ -20,6 +20,7 @@ from datetime import datetime
 
 f = open("accel.csv", "w", newline="")
 c=csv.writer(f)
+start = time.monotonic()
 xyz = 5
 x = 0
 y = 0
@@ -58,8 +59,8 @@ while(True):
     mag_x, mag_y, mag_z = sensor.magnetic
     gyro_x, gyro_y, gyro_z = sensor.gyro
     temp = sensor.temperature
-    now = datetime.now()
-    c.writerow([time.monotonic(), accel_x, accel_y, accel_z, temp])
+    now = start - time.monotonic()
+    c.writerow([now, accel_x, accel_y, accel_z, temp])
     # Print values.
     print('Acceleration (m/s^2): ({0:0.3f},{1:0.3f},{2:0.3f})'.format(accel_x, accel_y, accel_z))
     print('Magnetometer (gauss): ({0:0.3f},{1:0.3f},{2:0.3f})'.format(mag_x, mag_y, mag_z))
@@ -70,7 +71,7 @@ while(True):
     # Draw framerate in corner of frame
     #print("eCO2 = %d ppm \t TVOC = %d ppb" % (sgp30.eCO2, sgp30.TVOC))
     
-    cv2.putText(frame,now.strftime("%H:%M:%S"),(30,50),cv2.FONT_HERSHEY_SIMPLEX,1,(51, 51, 0),2,cv2.LINE_AA)
+    cv2.putText(frame,datetime.now().strftime("%H:%M:%S"),(30,50),cv2.FONT_HERSHEY_SIMPLEX,1,(51, 51, 0),2,cv2.LINE_AA)
     #cv2.putText(frame,str(sgp30.eCO2),(30,90),cv2.FONT_HERSHEY_SIMPLEX,1,(51, 51, 0),2,cv2.LINE_AA)
     #print("eCO2 = %d ppm \t TVOC = %d ppb" % (sgp30.eCO2, sgp30.TVOC))
     #time.sleep(1)
