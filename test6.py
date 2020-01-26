@@ -36,7 +36,7 @@ y = 0
 z = 0
 declination = -0.106988683
 filename = 'video.avi' # .avi .mp4
-frames_per_seconds = 24.0
+frames_per_seconds = 10.0
 my_res = (640, 480) #'480p' # 1080p
 
 
