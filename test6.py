@@ -71,7 +71,8 @@ while(True):
                 offset = 10
                 h_offset = frame_h - watermark_h - offset
                 w_offset = frame_w - watermark_w - offset
-                overlay[h_offset + i, w_offset+ j] = watermark[i,j]
+                overlay[i, j] = watermark[i,j]
+                #overlay[h_offset + i, w_offset+ j] = watermark[i,j]
 
     cv2.addWeighted(overlay, 0.25, frame, 1.0, 0, frame)
 
