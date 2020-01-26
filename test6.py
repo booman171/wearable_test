@@ -23,7 +23,7 @@ c=csv.writer(f)
 
 start = time.monotonic()
 
-logo = cv2.imread('image.png', -1)
+logo = cv2.imread('compass.png', -1)
 watermark = image_resize(logo, height=50)
 watermark = cv2.cvtColor(watermark, cv2.COLOR_BGR2BGRA)
 
