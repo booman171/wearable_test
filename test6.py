@@ -102,7 +102,12 @@ while(True):
     
     heading = math.atan2(float(mag_y),float(mag_x)) + declination
     if heading > 2*math.pi:
+<<<<<<< HEAD
 	heading = heading - 2*math.pi
+=======
+        heading = heading - 2*math.pi
+        
+>>>>>>> 542a3006ea7e2ebfe51612d880da1c4d96dfd8f3
     if heading < 0:
 <<<<<<< HEAD
 	heading = heading + 2*math.pi
