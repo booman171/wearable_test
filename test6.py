@@ -27,9 +27,7 @@ logo = cv2.imread('images/compass_letters.png', -1)
 watermark = image_resize(logo, height=100)
 watermark = cv2.cvtColor(watermark, cv2.COLOR_BGR2BGRA)
 
-point = cv2.imread('images/compass_point.png', -1)
-compass = image_resize(point, height=100)
-compass = cv2.cvtColor(compass, cv2.COLOR_BGR2BGRA)
+
 
 xyz = 5
 x = 0
@@ -78,6 +76,10 @@ while(True):
                 w_offset = frame_w - watermark_w - offset
                 overlay[i, w_offset+ j] = watermark[i,j]
 
+    point = cv2.imread('images/compass_point.png', -1)
+    compass = image_resize(point, height=100)
+    compass = cv2.cvtColor(compass, cv2.COLOR_BGR2BGRA)
+    
     compass_h, compass_w, compass_c = compass.shape
     # replace overlay pixels with compass pixel values
     for i in range(0, compass_h):
@@ -100,7 +102,7 @@ while(True):
     now = datetime.now()
     c.writerow([time.monotonic(), accel_x, accel_y, accel_z, temp])
     
-    heading = math.atan2(float(mag_y),float(mag_x)) + declination
+    heading = math.atan2(float(mag_y),float(mag_z)) + declination
     if heading > 2*math.pi:
         heading = heading - 2*math.pi
         
