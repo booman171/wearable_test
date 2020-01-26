@@ -23,8 +23,7 @@ c=csv.writer(f)
 
 start = time.monotonic()
 
-img_path = 'images/logo/cfe-coffee.png'
-logo = cv2.imread(img_path, -1)
+logo = cv2.imread('image.png', -1)
 watermark = image_resize(logo, height=50)
 watermark = cv2.cvtColor(watermark, cv2.COLOR_BGR2BGRA)
 
@@ -60,6 +59,23 @@ elapsed_sec = 0
 while(True):
     # Capture frame-by-frame
     ret, frame = cap.read()
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2BGRA)
+    frame_h, frame_w, frame_c = frame.shape
+    # overlay with 4 channels BGR and Alpha
+    overlay = np.zeros((frame_h, frame_w, 4), dtype='uint8')
+    watermark_h, watermark_w, watermark_c = watermark.shape
+    # replace overlay pixels with watermark pixel values
+    for i in range(0, watermark_h):
+        for j in range(0, watermark_w):
+            if watermark[i,j][3] != 0:
+                offset = 10
+                h_offset = frame_h - watermark_h - offset
+                w_offset = frame_w - watermark_w - offset
+                overlay[h_offset + i, w_offset+ j] = watermark[i,j]
+
+    cv2.addWeighted(overlay, 0.25, frame, 1.0, 0, frame)
+
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
     
     # Read acceleration, magnetometer, gyroscope, temperature.
     accel_x, accel_y, accel_z = sensor.acceleration
