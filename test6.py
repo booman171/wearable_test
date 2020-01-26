@@ -36,7 +36,7 @@ y = 0
 z = 0
 declination = -0.106988683
 filename = 'video.avi' # .avi .mp4
-frames_per_seconds = 30.0
+frames_per_seconds = 20.0
 my_res = (640, 480) #'480p' # 1080p
 
 
@@ -131,7 +131,7 @@ while(True):
     #cv2.imshow('frame',frame)
     
     
-    if cv2.waitKey(20) & 0xFF == ord('q'):
+    if cv2.waitKey(50) & 0xFF == ord('q'):
         break
     
 f.close()
