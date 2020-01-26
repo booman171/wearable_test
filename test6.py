@@ -23,11 +23,11 @@ c=csv.writer(f)
 
 start = time.monotonic()
 
-logo = cv2.imread('compass_letters.png', -1)
+logo = cv2.imread('images/compass_letters.png', -1)
 watermark = image_resize(logo, height=100)
 watermark = cv2.cvtColor(watermark, cv2.COLOR_BGR2BGRA)
 
-point = cv2.imread('compass_point.png', -1)
+point = cv2.imread('images/compass_point.png', -1)
 compass = image_resize(point, height=100)
 compass = cv2.cvtColor(compass, cv2.COLOR_BGR2BGRA)
 
