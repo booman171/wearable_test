@@ -36,7 +36,7 @@ y = 0
 z = 0
 declination = -0.106988683
 filename = 'video.avi' # .avi .mp4
-frames_per_seconds = 20.0
+frames_per_seconds = 30.0
 my_res = (640, 480) #'480p' # 1080p
 
 
@@ -59,8 +59,14 @@ sensor = adafruit_lsm9ds1.LSM9DS1_I2C(i2c)
 
 elapsed_sec = 0
 
+length = 50;
+p1x = 590
+p1y = 110
+
 while(True):
     ret, frame = cap.read()
+    overlay = frame.copy()
+    
     # Read acceleration, magnetometer, gyroscope, temperature.
     accel_x, accel_y, accel_z = sensor.acceleration
     mag_x, mag_y, mag_z = sensor.magnetic
@@ -75,63 +81,35 @@ while(True):
     if heading < 0:
         heading = heading + 2*math.pi
     angle = (heading* 180 / math.pi)
-    compass = imutils.rotate(point, angle)
-    # Print values.
-    print('Heading Angle: ({0:0.3f})'.format(angle))
+
+    theta = angle - 90
     
-#     # Capture frame-by-frame
-#     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2BGRA)
-#     frame_h, frame_w, frame_c = frame.shape
-#     # overlay with 4 channels BGR and Alpha
-#     overlay = np.zeros((frame_h, frame_w, 4), dtype='uint8')
-#     
-#     watermark_h, watermark_w, watermark_c = watermark.shape
-#     # replace overlay pixels with watermark pixel values
-#     for i in range(0, watermark_h):
-#         for j in range(0, watermark_w):
-#             if watermark[i,j][3] != 0:
-#                 offset = 10
-#                 h_offset = frame_h - watermark_h - offset
-#                 w_offset = frame_w - watermark_w - offset
-#                 overlay[i, w_offset+ j] = watermark[i,j]
-# 
-#     
-#     compass = image_resize(compass, height=100)
-#     compass = cv2.cvtColor(compass, cv2.COLOR_BGR2BGRA)
-#     compass_h, compass_w, compass_c = compass.shape
-#     # replace overlay pixels with compass pixel values
-#     for i in range(0, compass_h):
-#         for j in range(0, compass_w):
-#             if compass[i,j][3] != 0:
-#                 offset = 10
-#                 h_offset = frame_h - compass_h - offset
-#                 w_offset = frame_w - compass_w - offset
-#                 overlay[i, w_offset+ j] = compass[i,j]
-#                 
-#     cv2.addWeighted(overlay, 1.00, frame, 1.0, 0, frame)
-#     frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
-    
-    
-    #print('Acceleration (m/s^2): ({0:0.3f},{1:0.3f},{2:0.3f})'.format(accel_x, accel_y, accel_z))
-    #print('Magnetometer (gauss): ({0:0.3f},{1:0.3f},{2:0.3f})'.format(mag_x, mag_y, mag_z))
-    #print('Gyroscope (degrees/sec): ({0:0.3f},{1:0.3f},{2:0.3f})'.format(gyro_x, gyro_y, gyro_z))
-    #print('Temperature: {0:0.3f}C'.format(temp))
-    
-    # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    # Draw framerate in corner of frame
+    p2x =  int(p1x + length * math.cos(theta * math.pi / 180.0));
+    p2y =  int(p1y + length * math.sin(theta * math.pi / 180.0));
+    print("x: ", p2x)
+    print("y: ", p2y)
+    cv2.circle(overlay, (590, 110), 15, (0, 255, 255), -1)
+    cv2.arrowedLine(overlay, (590,110), (p2x, p2y), (0, 255, 0), 2)
+    cv2.putText(overlay, "N",(585,72),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),1,cv2.LINE_AA)
+    cv2.putText(overlay, "E",(630,115),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),1,cv2.LINE_AA)
+    cv2.putText(overlay, "S",(585,158),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),1,cv2.LINE_AA)
+    cv2.putText(overlay, "W",(542,115),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),1,cv2.LINE_AA)
+    #cv2.circle(overlay, (166, 132), 12, (0, 255, 0), -1)
+    # (3) blend with the original:
+    #img_mod = cv2.polylines(overlay, [penta], True, (0,120,255),3)
+    opacity = 0.4
+    cv2.putText(overlay,now.strftime("%H:%M:%S"),(30,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(51, 51, 0),2,cv2.LINE_AA)
+    cv2.putText(overlay,"Heading: " + str(round(angle, 1)),(500,50),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),2,cv2.LINE_AA)
     #print("eCO2 = %d ppm \t TVOC = %d ppb" % (sgp30.eCO2, sgp30.TVOC))
-    
-    cv2.putText(frame,now.strftime("%H:%M:%S"),(30,50),cv2.FONT_HERSHEY_SIMPLEX,1,(51, 51, 0),2,cv2.LINE_AA)
-    cv2.putText(frame,str(round(angle, 1)),(500,50),cv2.FONT_HERSHEY_SIMPLEX,1,(51, 51, 0),2,cv2.LINE_AA)
-    #print("eCO2 = %d ppm \t TVOC = %d ppb" % (sgp30.eCO2, sgp30.TVOC))
-    #time.sleep(1)
+
+    cv2.addWeighted(overlay, opacity, frame, 1 - opacity, 0, frame)
     #elapsed_sec += 1
     out.write(frame)
     # Display the resulting frame
-    #cv2.imshow('frame',frame)
+    cv2.imshow('frame',frame)
     
     
-    if cv2.waitKey(100) & 0xFF == ord('q'):
+    if cv2.waitKey(20) & 0xFF == ord('q'):
         break
     
 f.close()
