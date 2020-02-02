@@ -1,9 +1,10 @@
 # Wearable1
 ![](sample.gif)
 
-This is the first part of an ongoing project to create an smart wearable system. The idea for the part is to have a body-worn camera (picamera) located on the chest stream through the raspberry pi. The output of the stream displays data to the viewer
- about the person wearing the system (i.e., heading, temperature, pulse, breathing, etc.).  The current script uses an IMU and picamera to display heading and temperature on video output, write sensor data to a csv file, and record the output to a video file.
- 
+This is the first part of an ongoing project to create an smart wearable system. The idea for the part is to have a body-worn camera (picamera) located on the chest stream through the raspberry pi, like a police body-cam. The output of the stream displays data to the viewer about the person wearing the system (i.e., heading, temperature, pulse, breathing, etc.).  The current script uses an IMU and picamera to display heading and temperature on video output, write sensor data to a csv file, and record the output to a video file.
+![](pic1.jpg)
+![](pic2.jpg)
+![](pic3.jpg)
  Requirements
  The program uses Python3, Opencv, and several libraries
  
