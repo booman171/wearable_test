@@ -106,7 +106,7 @@ overlay_t = cv2.imread('therm.png',-1)
 while(True):
     ret, frame = cap.read()
     #overlay = frame.copy()
-    overlay = overlay_transparent(img, overlay_t, 0, 0, (100,100))
+    overlay = overlay_transparent(frame, overlay_t, 10, 80, (50,50))
 
     
     # Read acceleration, magnetometer, gyroscope, temperature.
@@ -139,9 +139,11 @@ while(True):
     #cv2.circle(overlay, (166, 132), 12, (0, 255, 0), -1)
     # (3) blend with the original:
     #img_mod = cv2.polylines(overlay, [penta], True, (0,120,255),3)
-    opacity = 0.4
+    opacity = 0.8
     cv2.putText(overlay,now.strftime("%H:%M:%S"),(30,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(51, 51, 0),2,cv2.LINE_AA)
     cv2.putText(overlay,"Heading: " + str(round(angle, 1)),(500,50),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),2,cv2.LINE_AA)
+    cv2.putText(overlay,"Temp(C): ",(50,95),cv2.FONT_HERSHEY_SIMPLEX,0.3,(51, 51, 0),1,cv2.LINE_AA)
+    cv2.putText(overlay,str(temp),(50,120),cv2.FONT_HERSHEY_SIMPLEX,0.8,(51, 51, 0),2,cv2.LINE_AA)
     #print("eCO2 = %d ppm \t TVOC = %d ppb" % (sgp30.eCO2, sgp30.TVOC))
 
     cv2.addWeighted(overlay, opacity, frame, 1 - opacity, 0, frame)
