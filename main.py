@@ -52,6 +52,10 @@ sensor = adafruit_lsm9ds1.LSM9DS1_I2C(i2c)
 #sgp30.iaq_init()
 #sgp30.set_iaq_baseline(0x8973, 0x8aae)
 
+# Define text-to-speak  function
+def speak(text):
+	os.system("espeak ' " + text + " ' ")
+
 # Define method for overlaying trasnparent images
 # copied from https://gist.github.com/clungzta/b4bbb3e2aa0490b0cfcbc042184b0b4e
 def overlay_transparent(background_img, img_to_overlay_t, x, y, overlay_size=None):
@@ -95,6 +99,7 @@ p1y = 110
 overlay_t = cv2.imread('therm.png',-1)
 
 # Video processing
+speak("Recording Started")
 while(True):
     # set each frame from camera as 'frame'
     ret, frame = cap.read()
