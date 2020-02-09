@@ -98,6 +98,10 @@ p1y = 110
 # Read in transparent image of thermostat icon
 overlay_t = cv2.imread('therm.png',-1)
 
+max = 2400
+min = 400
+breath = 0
+warmup = 0
 # Video processing
 while(True):
     # set each frame from camera as 'frame'
@@ -105,6 +109,7 @@ while(True):
     # Create overlay of frame add transparent image at screen coordinates (10, 80)
     overlay = overlay_transparent(frame, overlay_t, 10, 80, (50,50))
     
+    warmup += 1
     # Read acceleration, magnetometer, gyroscope,
     # and temperature from the LSM9DS1 Sensor
     accel_x, accel_y, accel_z = sensor.acceleration
@@ -133,7 +138,23 @@ while(True):
     p2y =  int(p1y + length * math.sin(theta * math.pi / 180.0));
     #print("x: ", p2x)
     #print("y: ", p2y)
-	
+    
+    # Normalization equation: (x - min)/(max - min)
+    # This will convert a data range [min,max] to the range [0,1]
+    # To correpond the normalized eCO2 to the screen I need to
+    # invert the normalized range by subtracting theefunction from 1:
+    # 1-(x - min)/(max-min) or (max - x)/(max - min)
+    gas = (max - eco2) / (max - min)
+    breath = int(gas*100 + 250)
+    # Gas sensor warmup complete around warmup = 120
+    # print(str(warmup))
+    print("breath = %2f" % (breath))
+    # Overlay 'Breath: '
+    cv2.putText(overlay,"Breath: ",(25,370),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),1,cv2.LINE_AA)
+    # Overlay eCO2 data
+    cv2.putText(overlay,str(eco2) + "ppm",(25,390),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),1,cv2.LINE_AA)
+    # Breath meter
+    cv2.rectangle(overlay, (30, breath), (35,350), (255, 0, 0), 5)
     # Overlay circle as center of compass
     cv2.circle(overlay, (590, 110), 15, (0, 255, 255), -1)
     # Overlay compass arrow, start point at center of compass, point at heading (px2, pxy)
@@ -155,8 +176,7 @@ while(True):
     cv2.putText(overlay,"Temp(C): ",(50,95),cv2.FONT_HERSHEY_SIMPLEX,0.3,(51, 51, 0),1,cv2.LINE_AA)
     # Overlay temp data
     cv2.putText(overlay,str(temp),(50,120),cv2.FONT_HERSHEY_SIMPLEX,0.8,(51, 51, 0),2,cv2.LINE_AA)
-    print("eCO2 = %d ppm" % (sgp30.eCO2))
-
+# 
     # Combine overlay to frame, apply transparency
     cv2.addWeighted(overlay, opacity, frame, 1 - opacity, 0, frame)
 
