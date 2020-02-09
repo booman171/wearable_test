@@ -15,7 +15,7 @@ import adafruit_lsm9ds1
 import csv
 from datetime import datetime
 import math
-import imutils
+# import imutils
 
 # Create accel.csv file to write sensor data to
 f = open("accel.csv", "w", newline="")
@@ -47,10 +47,10 @@ i2c = busio.I2C(board.SCL, board.SDA, frequency=100000)
 sensor = adafruit_lsm9ds1.LSM9DS1_I2C(i2c)
 
 # Setup for gas sensor https://www.adafruit.com/product/3709
-#sgp30 = adafruit_sgp30.Adafruit_SGP30(i2c)
-#print("SGP30 serial #", [hex(i) for i in sgp30.serial])
-#sgp30.iaq_init()
-#sgp30.set_iaq_baseline(0x8973, 0x8aae)
+sgp30 = adafruit_sgp30.Adafruit_SGP30(i2c)
+print("SGP30 serial #", [hex(i) for i in sgp30.serial])
+sgp30.iaq_init()
+sgp30.set_iaq_baseline(0x8973, 0x8aae)
 
 # Define text-to-speak  function
 def speak(text):
@@ -99,22 +99,24 @@ p1y = 110
 overlay_t = cv2.imread('therm.png',-1)
 
 # Video processing
-speak("Recording Started")
 while(True):
     # set each frame from camera as 'frame'
     ret, frame = cap.read()
     # Create overlay of frame add transparent image at screen coordinates (10, 80)
     overlay = overlay_transparent(frame, overlay_t, 10, 80, (50,50))
     
-    # Read acceleration, magnetometer, gyroscope, temperature.
+    # Read acceleration, magnetometer, gyroscope,
+    # and temperature from the LSM9DS1 Sensor
     accel_x, accel_y, accel_z = sensor.acceleration
     mag_x, mag_y, mag_z = sensor.magnetic
     gyro_x, gyro_y, gyro_z = sensor.gyro
     temp = sensor.temperature
+    # Read eCO2 rom SGP30 Sensor
+    eco2 = sgp30.eCO2
     # Set var now to current date/time
     now = datetime.now()
     # Write time and sensor data to csv by column
-    c.writerow([time.monotonic(), accel_x, accel_y, accel_z, temp])
+    c.writerow([time.monotonic(), eco2, accel_x, accel_y, accel_z, temp])
     
     # Calculate heading from magnetometer data
     # Code adapted from https://www.electronicwings.com/avr-atmega/magnetometer-hmc5883l-interfacing-with-atmega16
@@ -153,7 +155,7 @@ while(True):
     cv2.putText(overlay,"Temp(C): ",(50,95),cv2.FONT_HERSHEY_SIMPLEX,0.3,(51, 51, 0),1,cv2.LINE_AA)
     # Overlay temp data
     cv2.putText(overlay,str(temp),(50,120),cv2.FONT_HERSHEY_SIMPLEX,0.8,(51, 51, 0),2,cv2.LINE_AA)
-    #print("eCO2 = %d ppm \t TVOC = %d ppb" % (sgp30.eCO2, sgp30.TVOC))
+    print("eCO2 = %d ppm" % (sgp30.eCO2))
 
     # Combine overlay to frame, apply transparency
     cv2.addWeighted(overlay, opacity, frame, 1 - opacity, 0, frame)
@@ -163,7 +165,7 @@ while(True):
 
     # Display the resulting frame
     # Comment out if using ssh to run script
-    #cv2.imshow('frame',frame)
+    cv2.imshow('frame',frame)
 
     # Break loop
     if cv2.waitKey(20) & 0xFF == ord('q'):
