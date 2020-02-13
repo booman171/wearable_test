@@ -175,7 +175,7 @@ while(True):
 
     # Display the resulting frame
     # Comment out if using ssh to run script
-    cv2.imshow('frame',frame)
+    #cv2.imshow('frame',frame)
 
     # Break loop
     if cv2.waitKey(20) & 0xFF == ord('q'):
