@@ -23,14 +23,15 @@ c=csv.writer(f)
 
 # Set time at start of program
 start = time.monotonic()
+timestr = time.strftime("%Y%m%d-%H%M%S")
 
 # Set declination based on location http://www.magnetic-declination.com/
 declination = -0.106988683
 
 # Set filename video.avi for recording camera output
-filename = 'video.avi' # .avi .mp4
+filename = 'video' + timestr + '.avi' # .avi .mp4
 # Set picamera standard frame rate
-frames_per_seconds = 30.0
+frames_per_seconds = 10.0
 # Set recording resolution
 my_res = (640, 480) #'480p' # 1080p
 # Read from default (0) camera
@@ -40,7 +41,7 @@ video_type_cv2 = cv2.VideoWriter_fourcc(*'XVID')
 # Save video.avi to current directory
 save_path = os.path.join(filename)
 # Create video
-out = cv2.VideoWriter('video.avi', video_type_cv2,frames_per_seconds,  my_res)
+out = cv2.VideoWriter(save_path, video_type_cv2,frames_per_seconds,  my_res)
 
 # I2C connection for sensor LSM9DS1 https://www.adafruit.com/product/3387
 i2c = busio.I2C(board.SCL, board.SDA, frequency=100000)
@@ -109,7 +110,7 @@ while(True):
     # Create overlay of frame add transparent image at screen coordinates (10, 80)
     overlay = overlay_transparent(frame, overlay_t, 10, 80, (50,50))
     
-    warmup += 1
+    #warmup += 1
     # Read acceleration, magnetometer, gyroscope,
     # and temperature from the LSM9DS1 Sensor
     accel_x, accel_y, accel_z = sensor.acceleration
@@ -147,23 +148,23 @@ while(True):
     gas = (max - eco2) / (max - min)
     breath = int(gas*100 + 250)
     # Gas sensor warmup complete around warmup = 120
-    # print(str(warmup))
-    print("breath = %2f" % (breath))
+    print("gas: %2f" % (eco2))
+    #print("breath = %2f" % (breath))
     # Overlay 'Breath: '
-    cv2.putText(overlay,"Breath: ",(25,370),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),1,cv2.LINE_AA)
+    cv2.putText(overlay,"Exhale: ",(25,370),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),1,cv2.LINE_AA)
     # Overlay eCO2 data
     cv2.putText(overlay,str(eco2) + "ppm",(25,390),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),1,cv2.LINE_AA)
     # Breath meter
     cv2.rectangle(overlay, (30, breath), (35,350), (255, 0, 0), 5)
-    # Overlay circle as center of compass
-    cv2.circle(overlay, (590, 110), 15, (0, 255, 255), -1)
-    # Overlay compass arrow, start point at center of compass, point at heading (px2, pxy)
-    cv2.arrowedLine(overlay, (590,110), (p2x, p2y), (0, 255, 0), 2)
-    # Overlay the four Cardinal directions for the compass
-    cv2.putText(overlay, "N",(585,72),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),1,cv2.LINE_AA)
-    cv2.putText(overlay, "E",(630,115),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),1,cv2.LINE_AA)
-    cv2.putText(overlay, "S",(585,158),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),1,cv2.LINE_AA)
-    cv2.putText(overlay, "W",(542,115),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),1,cv2.LINE_AA)
+#     # Overlay circle as center of compass
+#     cv2.circle(overlay, (590, 110), 15, (0, 255, 255), -1)
+#     # Overlay compass arrow, start point at center of compass, point at heading (px2, pxy)
+#     cv2.arrowedLine(overlay, (590,110), (p2x, p2y), (0, 255, 0), 2)
+#     # Overlay the four Cardinal directions for the compass
+#     cv2.putText(overlay, "N",(585,72),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),1,cv2.LINE_AA)
+#     cv2.putText(overlay, "E",(630,115),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),1,cv2.LINE_AA)
+#     cv2.putText(overlay, "S",(585,158),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),1,cv2.LINE_AA)
+#     cv2.putText(overlay, "W",(542,115),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),1,cv2.LINE_AA)
 
     # Set opacity for overlay transparency, the closer to 0 the more transparent
     opacity = 0.8
@@ -185,7 +186,7 @@ while(True):
 
     # Display the resulting frame
     # Comment out if using ssh to run script
-    cv2.imshow('frame',frame)
+#     cv2.imshow('frame',frame)
 
     # Break loop
     if cv2.waitKey(20) & 0xFF == ord('q'):
@@ -193,3 +194,4 @@ while(True):
 
 	# Close csv file   
 f.close()
+
