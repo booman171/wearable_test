@@ -8,14 +8,25 @@ import cv2
 import time
 import picamera
 import datetime as dt
-import board
-import busio
-import adafruit_sgp30
-import adafruit_lsm9ds1
 import csv
 from datetime import datetime
 import math
+import pygame
+from pygame.locals import *
+import sys
+import RPi.GPIO as GPIO
 # import imutils
+
+pygame.init()
+pygame.display.set_caption("OpenCV camera stream on Pygame")
+screen = pygame.display.set_mode([320,240])
+os.putenv('SDL_FBDEV', '/dev/fb1')
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(17, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(22, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(27, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 # Create accel.csv file to write sensor data to
 f = open("accel.csv", "w", newline="")
@@ -47,14 +58,6 @@ save_path = os.path.join(filename)
 
 # Create video
 out = cv2.VideoWriter(save_path, video_type_cv2,frames_per_seconds,  my_res)
-
-# I2C connection for sensor LSM9DS1 https://www.adafruit.com/product/3387
-# i2c = busio.I2C(board.SCL, board.SDA, frequency=100000)
-# sensor = adafruit_lsm9ds1.LSM9DS1_I2C(i2c)
-
-# Define text-to-speak  function
-def speak(text):
-	os.system("espeak ' " + text + " ' ")
 
 # Define method for overlaying trasnparent images
 # copied from https://gist.github.com/clungzta/b4bbb3e2aa0490b0cfcbc042184b0b4e
@@ -91,96 +94,35 @@ def overlay_transparent(background_img, img_to_overlay_t, x, y, overlay_size=Non
 	bg_img[y:y+h, x:x+w] = cv2.add(img1_bg, img2_fg)
 	return bg_img
 
-# Var for radius of compass
-length = 50;
-
-# (x,y) position for start of compass arrow
-p1x = 590
-p1y = 110
-
-# Read in transparent image of thermostat icon
-overlay_t = cv2.imread('therm.png',-1)
-
 # Video processing
 while(True):
-    # set each frame from camera as 'frame'
-    ret, frame = cap.read()
+	# set each frame from camera as 'frame'
+	ret, frame = cap.read()
+	
+	screen.fill([0,0,0])
 
-    # Create overlay of frame add transparent image at screen coordinates (10, 80)
-    overlay = overlay_transparent(frame, overlay_t, 10, 80, (50,50))
+	# Create overlay of frame add transparent image at screen coordinates (10, 80)
+	overlay = overlay_transparent(frame, overlay_t, 10, 80, (50,50))
 
-    # Read acceleration, magnetometer, gyroscope,
-    # and temperature from the LSM9DS1 Sensor
-#     accel_x, accel_y, accel_z = sensor.acceleration
-#     mag_x, mag_y, mag_z = sensor.magnetic
-#     gyro_x, gyro_y, gyro_z = sensor.gyro
-#     temp = sensor.temperature
+	# Set var now to current date/time
+	now = datetime.now()
 
-    # Set var now to current date/time
-    now = datetime.now()
+	# Set opacity for overlay transparency, the closer to 0 the more transparent
+	opacity = 0.8
 
-    # Write time and sensor data to csv by column
-#     c.writerow([time.monotonic(), accel_x, accel_y, accel_z, temp])
+	# Overlay date text
+	cv2.putText(overlay,now.strftime("%H:%M:%S"),(30,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(51, 51, 0),2,cv2.LINE_AA)
 
-#     # Calculate heading from magnetometer data
-#     # Code adapted from https://www.electronicwings.com/avr-atmega/magnetometer-hmc5883l-interfacing-with-atmega16
-#     heading = math.atan2(float(mag_y),float(mag_z)) + declination
-#     if heading > 2*math.pi:
-#         heading = heading - 2*math.pi
-#     if heading < 0:
-#         heading = heading + 2*math.pi
-#         
-#     angle = (heading* 180 / math.pi)
-#     theta = angle - 90
-# 
-#     # Calculate commpass head position (x, y) corresponding to heading angle
-#     p2x =  int(p1x + length * math.cos(theta * math.pi / 180.0));
-#     p2y =  int(p1y + length * math.sin(theta * math.pi / 180.0));
-# 
-#     #print("x: ", p2x)
-#     #print("y: ", p2y)
-# 
-#     # Overlay circle as center of compass
-#     cv2.circle(overlay, (590, 110), 15, (0, 255, 255), -1)
-# 
-#     # Overlay compass arrow, start point at center of compass, point at heading (px2, pxy)
-#     cv2.arrowedLine(overlay, (590,110), (p2x, p2y), (0, 255, 0), 2)
-# 
-#     # Overlay the four Cardinal directions for the compass
-#     cv2.putText(overlay, "N",(585,72),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),1,cv2.LINE_AA)
-#     cv2.putText(overlay, "E",(630,115),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),1,cv2.LINE_AA)
-#     cv2.putText(overlay, "S",(585,158),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),1,cv2.LINE_AA)
-#     cv2.putText(overlay, "W",(542,115),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),1,cv2.LINE_AA)
-
-    # Set opacity for overlay transparency, the closer to 0 the more transparent
-    opacity = 0.8
-
-    # Overlay date text
-    cv2.putText(overlay,now.strftime("%H:%M:%S"),(30,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(51, 51, 0),2,cv2.LINE_AA)
-
-    # Overlay 'Heading' heading
-#     cv2.putText(overlay,"Heading: " + str(round(angle, 1)),(500,50),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),2,cv2.LINE_AA)
-
-    # Overlay 'Temp(C):' heading
-#     cv2.putText(overlay,"Temp(C): ",(50,95),cv2.FONT_HERSHEY_SIMPLEX,0.3,(51, 51, 0),1,cv2.LINE_AA)
-
-    # Overlay temp data
-#     cv2.putText(overlay,str(temp),(50,120),cv2.FONT_HERSHEY_SIMPLEX,0.8,(51, 51, 0),2,cv2.LINE_AA)
-
-    # Combine overlay to frame, apply transparency
-    #cv2.addWeighted(overlay, opacity, frame, 1 - opacity, 0, frame)
-
-    # Write frame to video
-    out.write(frame)
-
-    # Display the resulting frame
-    # Comment out if using ssh to run script
-    #cv2.imshow('frame',frame)
-
-    # Break loop
-    if cv2.waitKey(20) & 0xFF == ord('q'):
-        break
-
+	# Write frame to video
+	out.write(frame)
+	
+	frame = pygame.surfarray.make_surface(frame)
+	screen.blit(frame, (0,0))
+	pygame.display.update()
+	
+	# Break loop
+	if cv2.waitKey(20) & 0xFF == ord('q'):
+		break
 	# Close csv file   
 f.close()
 
