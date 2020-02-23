@@ -112,13 +112,13 @@ while(True):
 
 	# Overlay date text
 	cv2.putText(overlay,now.strftime("%H:%M:%S"),(30,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(51, 51, 0),2,cv2.LINE_AA)
-
-	# Write frame to video
-	out.write(frame)
 	
 	frame = pygame.surfarray.make_surface(frame)
 	screen.blit(frame, (0,0))
 	pygame.display.update()
+	
+	# Write frame to video
+	out.write(frame)
 	
 	# Break loop
 	if cv2.waitKey(20) & 0xFF == ord('q'):
