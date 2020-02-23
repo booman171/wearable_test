@@ -118,7 +118,7 @@ while(True):
 	pygame.display.update()
 	
 	# Write frame to video
-	out.write(frame)
+	#out.write(frame)
 	
 	# Break loop
 	if cv2.waitKey(20) & 0xFF == ord('q'):
