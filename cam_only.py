@@ -84,8 +84,7 @@ def overlay_transparent(background_img, img_to_overlay_t, x, y, overlay_size=Non
         bg_img = background_img.copy()
         if overlay_size is not None:
                 img_to_overlay_t = cv2.resize(img_to_overlay_t.copy(), overlay_size)
-				
-		# Extract the alpha mask of the RGBA image, convert to RGB
+	# Extract the alpha mask of the RGBA image, convert to RGB
         b,g,r,a = cv2.split(img_to_overlay_t)
         overlay_color = cv2.merge((b,g,r))
 
@@ -134,7 +133,8 @@ while(True):
         # Combine overlay to frame, apply transparency
         cv2.addWeighted(overlay, opacity, frame, 1 - opacity, 0, frame)
         cv2.addWeighted(ov2, opacity, frame1, 1 - opacity, 0, frame1)
-        out.write(frame)
+
+	#out.write(frame)
 
         ov2 = cv2.cvtColor(ov2, cv2.COLOR_BGR2RGB)
         ov2 =  np.rot90(ov2)
