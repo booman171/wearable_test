@@ -150,11 +150,11 @@ while(True):
                 save_path = os.path.join(filename)
                 cv2.imwrite(save_path, frame)
         # Break loop
-        if GPIO.input(17) == False:
+    	if GPIO.input(17) == False:
                 pygame.quit()
                 break
 
 	# Break loop
 	if cv2.waitKey(20) & & 0xFF == ord('q'):
-	break
+		break
 
