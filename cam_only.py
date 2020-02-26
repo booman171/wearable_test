@@ -145,18 +145,18 @@ while(True):
     pygame.display.update()
 
     out.write(frame)
-
-	if GPIO.input(22) == False:
-		filename = "image_" + now.strftime("%H:%M:%S") + ".jpg"
-		save_path = os.path.join(filename)
-		cv2.imwrite(save_path, frame)
+    
+    if GPIO.input(22) == False:
+        filename = "image_" + now.strftime("%H:%M:%S") + ".jpg"
+        save_path = os.path.join(filename)
+        cv2.imwrite(save_path, frame)
+        
+    # Break loop
+    if GPIO.input(17) == False:
+        pygame.quit()
+        break
 
 	# Break loop
-	if GPIO.input(17) == False:
-		pygame.quit()
-		break
-
-	# Break loop
-	if cv2.waitKey(20) & & 0xFF == ord('q'):
-		break
+    if cv2.waitKey(20) & & 0xFF == ord('q'):
+        break
 
