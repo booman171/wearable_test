@@ -145,11 +145,12 @@ while(True):
         pygame.display.update()
 
         out.write(frame)
+
 	if GPIO.input(22) == False:
 		filename = "image_" + now.strftime("%H:%M:%S") + ".jpg"
 		save_path = os.path.join(filename)
 		cv2.imwrite(save_path, frame)
-		
+
 	# Break loop
 	if GPIO.input(17) == False:
 		pygame.quit()
