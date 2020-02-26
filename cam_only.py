@@ -50,7 +50,7 @@ filename = 'video' + timestr + '.avi' # .avi .mp4
 frames_per_seconds = 30.0
 
 # Set recording resolution
-my_res = (320, 240) #'480p' # 1080p
+my_res = (640, 480) #'480p' # 1080p
 
 # Read from default (0) camera
 cap = cv2.VideoCapture(0)
