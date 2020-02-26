@@ -144,7 +144,7 @@ while(True):
         screen.blit(ov2, (0,0))
         pygame.display.update()
 
-        #out.write(frame)
+        out.write(frame)
         if GPIO.input(22) == False:
                 filename = "image_" + now.strftime("%H:%M:%S") + ".jpg"
                 save_path = os.path.join(filename)
