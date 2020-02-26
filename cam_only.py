@@ -153,3 +153,8 @@ while(True):
         if GPIO.input(17) == False:
                 pygame.quit()
                 break
+
+	# Break loop
+	if cv2.waitKey(20) & & 0xFF == ord('q'):
+	break
+
