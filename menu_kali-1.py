@@ -98,8 +98,8 @@ def button(number):
         # next page
         pygame.quit()
         ##startx only works when we don't use subprocess here, don't know why
-	page=os.environ["MENUDIR"] + "menu_kali-2.py"
-	os.execvp("python", ["python", page])
+        page=os.environ["MENUDIR"] + "menu_kali-2.py"
+        os.execvp("python", ["python", page])
         sys.exit()
 
 
