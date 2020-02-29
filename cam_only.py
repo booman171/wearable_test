@@ -130,6 +130,15 @@ while(True):
         ov2= pygame.surfarray.make_surface(ov2)
         screen.blit(ov2, (0,0))
         pygame.display.update()
+        
+        if GPIO.input(23) == False:
+            main = False
+            cam = True
+        
+        # Break loop
+        if GPIO.input(27) == False:
+            pygame.quit()
+            break
     
     if cam == True:
         # set each frame from camera as 'frame'
@@ -138,7 +147,7 @@ while(True):
         screen.fill([0,0,0])
         
         # Create overlay of frame add transparent image at screen coordinates (10, 80)
-        overlay = overlay_transparent(frame, overlay_t, 10, 80, (50,50))
+        #overlay = overlay_transparent(frame, overlay_t, 10, 80, (50,50))
         ov2 = overlay_transparent(frame1, overlay_t, 5, 80, (50,50))
         
         # Set var now to current date/time
@@ -148,13 +157,15 @@ while(True):
         opacity = 0.8
 
         # Overlay date text
-        cv2.putText(overlay,now.strftime("%H:%M:%S"),(30,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(1, 1, 0),2,cv2.LINE_AA)
+        #cv2.putText(overlay,now.strftime("%H:%M:%S"),(30,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(1, 1, 0),2,cv2.LINE_AA)
         cv2.putText(ov2,now.strftime("%H:%M:%S"),(20,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),2,cv2.LINE_AA)
-        cv2.putText(ov2,"Exit",(265,220),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
-        cv2.putText(ov2,"Cam",(255,175),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        cv2.putText(ov2,"Rec",(255,150),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        cv2.putText(ov2,"Snap",(255,175),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        cv2.putText(ov2,"Menu",(265,220),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        
 
         # Combine overlay to frame, apply transparency
-        cv2.addWeighted(overlay, opacity, frame, 1 - opacity, 0, frame)
+        #cv2.addWeighted(overlay, opacity, frame, 1 - opacity, 0, frame)
         cv2.addWeighted(ov2, opacity, frame1, 1 - opacity, 0, frame1)
         #out.write(frame)
 
@@ -165,21 +176,22 @@ while(True):
         ov2= pygame.surfarray.make_surface(ov2)
         screen.blit(ov2, (0,0))
         pygame.display.update()
-        out.write(frame)
-    
-    if GPIO.input(23) == False:
-        main = False
-        cam = True
+        #out.write(frame)
         
-    if GPIO.input(22) == False:
-        filename = "image_" + now.strftime("%H:%M:%S") + ".jpg"
-        save_path = os.path.join(filename)
-        cv2.imwrite(save_path, frame)
+        if GPIO.input(17) == False:
+            out.write(frame)
+            
+        if GPIO.input(23) == False:
+            filename = "image_" + now.strftime("%H:%M:%S") + ".jpg"
+            save_path = os.path.join(filename)
+            cv2.imwrite(save_path, frame)
+    
+        if GPIO.input(27) == False:
+            main = True
+            cam = False
 
-    # Break loop
-    if GPIO.input(27) == False:
-        pygame.quit()
-        break
+
+
 
 	# Break loop
     if cv2.waitKey(20) & 0xFF == ord('q'):
