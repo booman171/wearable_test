@@ -161,7 +161,7 @@ while(True):
         cv2.putText(ov2,now.strftime("%H:%M:%S"),(20,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),2,cv2.LINE_AA)
         cv2.putText(ov2,"Rec",(255,80),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         cv2.putText(ov2,"Snap",(255,175),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
-        cv2.putText(ov2,"Menu",(260,220),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        cv2.putText(ov2,"Menu",(300,215),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         
 
         # Combine overlay to frame, apply transparency
@@ -188,7 +188,7 @@ while(True):
     
         if GPIO.input(27) == False:
             cam = False
-            time.sleep(1.0)
+            time.sleep(0.5)
             main = True
 
 
