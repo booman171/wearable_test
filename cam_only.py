@@ -160,7 +160,7 @@ while(True):
         #cv2.putText(overlay,now.strftime("%H:%M:%S"),(30,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(1, 1, 0),2,cv2.LINE_AA)
         cv2.putText(ov2,now.strftime("%H:%M:%S"),(20,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),2,cv2.LINE_AA)
         cv2.putText(ov2,"Rec",(255,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
-        cv2.putText(ov2,"Rec-Bio",(255,100),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        cv2.putText(ov2,"Rec-Bio",(24,100),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         cv2.putText(ov2,"Snap",(255,175),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         cv2.putText(ov2,"Menu",(255,230),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         
@@ -173,13 +173,12 @@ while(True):
         ov2 = cv2.cvtColor(ov2, cv2.COLOR_BGR2RGB)
         ov2 =  np.rot90(ov2)
         ov2 = cv2.flip(ov2, 0)
-        #overlay = np.flipud(overlay)
         ov2= pygame.surfarray.make_surface(ov2)
         screen.blit(ov2, (0,0))
         pygame.display.update()
-        #out.write(frame)
         
         if GPIO.input(17) == False:
+            cv2.circle(ov2, (315, 5), 2, (255,0,0), 1)
             out.write(frame)
             
         if GPIO.input(23) == False:
