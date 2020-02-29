@@ -1,14 +1,17 @@
 #!/usr/bin/env python
-import sys, os, time, subprocess, commands, pygame
+import sys, os, time, subprocess, pygame
 from pygame.locals import *
 from subprocess import *
+
+pygame.init()
+
 os.environ["SDL_FBDEV"] = "/dev/fb1"
 os.environ["SDL_MOUSEDEV"] = "/dev/input/touchscreen"
 os.environ["SDL_MOUSEDRV"] = "TSLIB"
 
 # Initialize pygame modules individually (to avoid ALSA errors) and hide mouse
-pygame.font.init()
-pygame.display.init()
+#pygame.font.init()
+#pygame.display.init()
 
 pygame.mouse.set_visible(0)
 
@@ -132,7 +135,7 @@ tron_inverse = tron_whi
 # Set up the base menu you can customize your menu with the colors above
 
 #set size of the screen
-size = width, height = 480, 320
+size = width, height = 320, 240
 screen = pygame.display.set_mode(size)
 
 # Background Color
@@ -143,7 +146,7 @@ pygame.draw.rect(screen, tron_regular, (0,0,479,319),8)
 pygame.draw.rect(screen, tron_light, (2,2,479-4,319-4),2)
 
 pi_hostname = run_cmd("hostname")
-pi_hostname = "  " + pi_hostname[:-1]
+pi_hostname = "  " +str(pi_hostname[:-1])
 # Buttons and labels
 # First Row Label
 make_label(pi_hostname, 32, 30, 48, tron_inverse)
