@@ -68,7 +68,7 @@ out = cv2.VideoWriter(save_path, video_type_cv2,frames_per_seconds,  my_res)
 overlay_t = cv2.imread('therm.png', -1)
 
 show = True
-
+cam = False
 # Define method for overlaying trasnparent images
 # copied from https://gist.github.com/clungzta/b4bbb3e2aa0490b0cfcbc042184b0b4e
 def overlay_transparent(background_img, img_to_overlay_t, x, y, overlay_size=None):
@@ -110,32 +110,14 @@ while(True):
     # set each frame from camera as 'frame'
     ret, frame = cap.read()
     frame1 = frame.copy()
-
     screen.fill([0,0,0])
-
-    # Create overlay of frame add transparent image at screen coordinates (10, 80)
-    overlay = overlay_transparent(frame, overlay_t, 10, 80, (50,50))
     ov2 = overlay_transparent(frame1, overlay_t, 5, 80, (50,50))
-    #ov2 = np.rot90(ov2)
-
-    # Set var now to current date/time
     now = datetime.now()
-
-    # Set opacity for overlay transparency, the closer to 0 the more transparent
     opacity = 0.8
-
-    # Overlay date text
-    cv2.putText(overlay,now.strftime("%H:%M:%S"),(30,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(1, 1, 0),2,cv2.LINE_AA)
+    cv2.rectangle(ov2,(0,0),(320,240),(0,255,0),cv2.FILLED)
     cv2.putText(ov2,now.strftime("%H:%M:%S"),(20,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(51, 51, 0),2,cv2.LINE_AA)
     cv2.putText(ov2,"End",(270,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(69, 244, 30),1,cv2.LINE_AA)
-
-
-    # Combine overlay to frame, apply transparency
-    cv2.addWeighted(overlay, opacity, frame, 1 - opacity, 0, frame)
     cv2.addWeighted(ov2, opacity, frame1, 1 - opacity, 0, frame1)
-
-    #out.write(frame)
-
     ov2 = cv2.cvtColor(ov2, cv2.COLOR_BGR2RGB)
     ov2 =  np.rot90(ov2)
     ov2 = cv2.flip(ov2, 0)
@@ -143,9 +125,37 @@ while(True):
     ov2= pygame.surfarray.make_surface(ov2)
     screen.blit(ov2, (0,0))
     pygame.display.update()
+    
+    If cam == True:
+
+        # Create overlay of frame add transparent image at screen coordinates (10, 80)
+        overlay = overlay_transparent(frame, overlay_t, 10, 80, (50,50))
+        #ov2 = np.rot90(ov2)
+
+        # Set var now to current date/time
+        
+
+        # Set opacity for overlay transparency, the closer to 0 the more transparent
+        
+
+        # Overlay date text
+        cv2.putText(overlay,now.strftime("%H:%M:%S"),(30,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(1, 1, 0),2,cv2.LINE_AA)
+        
+
+        # Combine overlay to frame, apply transparency
+        cv2.addWeighted(overlay, opacity, frame, 1 - opacity, 0, frame)
+
+        #out.write(frame)
+
+        ov2 = cv2.cvtColor(ov2, cv2.COLOR_BGR2RGB)
+        ov2 =  np.rot90(ov2)
+        ov2 = cv2.flip(ov2, 0)
+        #overlay = np.flipud(overlay)
+        ov2= pygame.surfarray.make_surface(ov2)
+        screen.blit(ov2, (0,0))
+        pygame.display.update()
 
     out.write(frame)
-
     if GPIO.input(22) == False:
         filename = "image_" + now.strftime("%H:%M:%S") + ".jpg"
         save_path = os.path.join(filename)
