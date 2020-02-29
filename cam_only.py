@@ -118,7 +118,7 @@ while(True):
         ov = overlay_transparent(frame1, overlay_t, 5, 80, (50,50))
         now = datetime.now()
         opacity = 0.8
-        cv2.rectangle(ov2,(0,0),(320,240),(51,51,0),cv2.FILLED)
+        cv2.rectangle(ov,(0,0),(320,240),(51,51,0),cv2.FILLED)
         cv2.putText(ov,now.strftime("%H:%M:%S"),(20,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),2,cv2.LINE_AA)
         cv2.putText(ov,"Exit",(265,220),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         cv2.putText(ov,"Cam",(255,175),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
@@ -127,7 +127,7 @@ while(True):
         ov =  np.rot90(ov)
         ov = cv2.flip(ov, 0)
         #overlay = np.flipud(overlay)
-        ov2= pygame.surfarray.make_surface(ov)
+        ov= pygame.surfarray.make_surface(ov)
         screen.blit(ov, (0,0))
         pygame.display.update()
         
