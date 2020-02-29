@@ -20,7 +20,7 @@ def make_button(text, xpo, ypo, height, width, colour):
     pygame.draw.rect(screen, tron_regular, (xpo-10,ypo-10,width,height),3)
     pygame.draw.rect(screen, tron_light, (xpo-9,ypo-9,width-1,height-1),1)
     pygame.draw.rect(screen, tron_regular, (xpo-8,ypo-8,width-2,height-2),1)
-    font=pygame.font.Font(None,42)
+    font=pygame.font.Font(None,32)
     label=font.render(str(text), 1, (colour))
     screen.blit(label,(xpo,ypo))
 
@@ -37,22 +37,22 @@ def on_touch():
     touch_pos = (pygame.mouse.get_pos() [0], pygame.mouse.get_pos() [1])
     #  x_min                 x_max   y_min                y_max
     # button 1 event
-    if 30 <= touch_pos[0] <= 240 and 105 <= touch_pos[1] <=160:
+    if 30 <= touch_pos[0] <= 160 and 80 <= touch_pos[1] <=130:
             button(1)
     # button 2 event
-    if 260 <= touch_pos[0] <= 470 and 105 <= touch_pos[1] <=160:
+    if 180 <= touch_pos[0] <= 310 and 80 <= touch_pos[1] <=130:
             button(2)
     # button 3 event
-    if 30 <= touch_pos[0] <= 240 and 180 <= touch_pos[1] <=235:
+    if 30 <= touch_pos[0] <= 160 and 140 <= touch_pos[1] <=190:
             button(3)
     # button 4 event
-    if 260 <= touch_pos[0] <= 470 and 180 <= touch_pos[1] <=235:
+    if 180 <= touch_pos[0] <= 310 and 140 <= touch_pos[1] <=190:
             button(4)
     # button 5 event
-    if 30 <= touch_pos[0] <= 240 and 255 <= touch_pos[1] <=310:
+    if 30 <= touch_pos[0] <= 160 and 200 <= touch_pos[1] <=250:
             button(5)
     # button 6 event
-    if 260 <= touch_pos[0] <= 470 and 255 <= touch_pos[1] <=310:
+    if 180 <= touch_pos[0] <= 310 and 200 <= touch_pos[1] <=250:
             button(6)
 
 def run_cmd(cmd):
@@ -149,16 +149,16 @@ pi_hostname = run_cmd("hostname")
 pi_hostname = "  " +str(pi_hostname[:-1])
 # Buttons and labels
 # First Row Label
-make_label(pi_hostname, 32, 30, 48, tron_inverse)
+make_label(pi_hostname, 20, 20, 38, tron_inverse)
 # Second Row buttons 3 and 4
-make_button("    X on TFT", 30, 105, 55, 210, tron_light)
-make_button("   X on HDMI", 260, 105, 55, 210, tron_light)
+make_button("X on TFT", 30, 80, 50, 130, tron_light)
+make_button("X on HDMI", 180, 80, 50, 130, tron_light)
 # Third Row buttons 5 and 6
-make_button("    Terminal", 30, 180, 55, 210, tron_light)
-make_button("        hTop", 260, 180, 55, 210, tron_light)
+make_button("Terminal", 30, 140, 50, 130, tron_light)
+make_button("hTop", 180, 140, 50, 130, tron_light)
 # Fourth Row Buttons
-make_button("   Screen Off", 30, 255, 55, 210, tron_light)
-make_button("          >>>", 260, 255, 55, 210, tron_light)
+make_button("Screen Off", 30, 200, 50, 130, tron_light)
+make_button(" >>>", 180, 200, 50, 130, tron_light)
 
 
 #While loop to manage touch screen inputs
