@@ -127,7 +127,7 @@ while(True):
     screen.blit(ov2, (0,0))
     pygame.display.update()
     
-if cam == True:
+    if cam == True:
 
         # Create overlay of frame add transparent image at screen coordinates (10, 80)
         overlay = overlay_transparent(frame, overlay_t, 10, 80, (50,50))
