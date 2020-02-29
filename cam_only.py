@@ -117,7 +117,7 @@ while(True):
     opacity = 0.8
     cv2.rectangle(ov2,(0,0),(320,240),(51,51,0),cv2.FILLED)
     cv2.putText(ov2,now.strftime("%H:%M:%S"),(20,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),2,cv2.LINE_AA)
-    cv2.putText(ov2,"Exit",(265,200),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+    cv2.putText(ov2,"Exit",(265,220),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
     cv2.putText(ov2,"Cam",(265,120),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
     cv2.addWeighted(ov2, opacity, frame1, 1 - opacity, 0, frame1)
     ov2 = cv2.cvtColor(ov2, cv2.COLOR_BGR2RGB)
