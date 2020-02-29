@@ -108,7 +108,7 @@ tag_date = ""
 show = True
 cam = False
 main = True
-Recording = False
+recording = False
 # Video processing
 while(True):
     if main == True:
@@ -180,7 +180,7 @@ while(True):
         
         if GPIO.input(17) == False:
             recording = True
-            while Recording == True:
+            while recording == True:
                 # set each frame from camera as 'frame'
                 # Create overlay of frame add transparent image at screen coordinates (10, 80)
                 #overlay = overlay_transparent(frame, overlay_t, 10, 80, (50,50))
