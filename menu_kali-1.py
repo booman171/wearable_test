@@ -83,7 +83,7 @@ def button(number):
     if number == 4:
         # htop
         pygame.quit()
-	process = subprocess.call("/usr/bin/htop", shell=True)
+        process = subprocess.call("/usr/bin/htop", shell=True)
         os.execv(__file__, sys.argv)        
 
     if number == 5:
