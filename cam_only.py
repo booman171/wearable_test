@@ -107,7 +107,7 @@ tag_date = ""
 
 show = True
 cam = False
-main = True
+main = TrueRecording = False
 # Video processing
 while(True):
     if main == True:
@@ -115,20 +115,20 @@ while(True):
         ret, frame = cap.read()
         frame1 = frame.copy()
         screen.fill([0,0,0])
-        ov2 = overlay_transparent(frame1, overlay_t, 5, 80, (50,50))
+        ov = overlay_transparent(frame1, overlay_t, 5, 80, (50,50))
         now = datetime.now()
         opacity = 0.8
         cv2.rectangle(ov2,(0,0),(320,240),(51,51,0),cv2.FILLED)
-        cv2.putText(ov2,now.strftime("%H:%M:%S"),(20,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),2,cv2.LINE_AA)
-        cv2.putText(ov2,"Exit",(265,220),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
-        cv2.putText(ov2,"Cam",(255,175),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
-        cv2.addWeighted(ov2, opacity, frame1, 1 - opacity, 0, frame1)
-        ov2 = cv2.cvtColor(ov2, cv2.COLOR_BGR2RGB)
-        ov2 =  np.rot90(ov2)
-        ov2 = cv2.flip(ov2, 0)
+        cv2.putText(ov,now.strftime("%H:%M:%S"),(20,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),2,cv2.LINE_AA)
+        cv2.putText(ov,"Exit",(265,220),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        cv2.putText(ov,"Cam",(255,175),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        cv2.addWeighted(ov, opacity, frame1, 1 - opacity, 0, frame1)
+        ov = cv2.cvtColor(ov, cv2.COLOR_BGR2RGB)
+        ov =  np.rot90(ov)
+        ov = cv2.flip(ov, 0)
         #overlay = np.flipud(overlay)
-        ov2= pygame.surfarray.make_surface(ov2)
-        screen.blit(ov2, (0,0))
+        ov2= pygame.surfarray.make_surface(ov)
+        screen.blit(ov, (0,0))
         pygame.display.update()
         
         if GPIO.input(23) == False:
@@ -148,7 +148,7 @@ while(True):
         
         # Create overlay of frame add transparent image at screen coordinates (10, 80)
         #overlay = overlay_transparent(frame, overlay_t, 10, 80, (50,50))
-        ov2 = overlay_transparent(frame1, overlay_t, 5, 80, (50,50))
+        ov = overlay_transparent(frame1, overlay_t, 5, 80, (50,50))
         
         # Set var now to current date/time
         now = datetime.now()
@@ -158,28 +158,61 @@ while(True):
 
         # Overlay date text
         #cv2.putText(overlay,now.strftime("%H:%M:%S"),(30,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(1, 1, 0),2,cv2.LINE_AA)
-        cv2.putText(ov2,now.strftime("%H:%M:%S"),(20,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),2,cv2.LINE_AA)
-        cv2.putText(ov2,"Rec",(255,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
-        cv2.putText(ov2,"Rec-Bio",(24,100),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
-        cv2.putText(ov2,"Snap",(255,175),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
-        cv2.putText(ov2,"Menu",(255,230),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        cv2.putText(ov,now.strftime("%H:%M:%S"),(20,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),2,cv2.LINE_AA)
+        cv2.putText(ov,"Rec",(255,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        cv2.putText(ov,"Rec-Bio",(245,100),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        cv2.putText(ov,"Snap",(255,175),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        cv2.putText(ov,"Menu",(255,230),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         
 
         # Combine overlay to frame, apply transparency
         #cv2.addWeighted(overlay, opacity, frame, 1 - opacity, 0, frame)
-        cv2.addWeighted(ov2, opacity, frame1, 1 - opacity, 0, frame1)
+        cv2.addWeighted(ov, opacity, frame1, 1 - opacity, 0, frame1)
         #out.write(frame)
 
-        ov2 = cv2.cvtColor(ov2, cv2.COLOR_BGR2RGB)
-        ov2 =  np.rot90(ov2)
-        ov2 = cv2.flip(ov2, 0)
-        ov2= pygame.surfarray.make_surface(ov2)
-        screen.blit(ov2, (0,0))
+        ov = cv2.cvtColor(ov, cv2.COLOR_BGR2RGB)
+        ov =  np.rot90(ov)
+        ov = cv2.flip(ov, 0)
+        ov = pygame.surfarray.make_surface(ov)
+        screen.blit(ov, (0,0))
         pygame.display.update()
         
         if GPIO.input(17) == False:
-            cv2.circle(ov2, (315, 5), 2, (255,0,0), 1)
-            out.write(frame)
+            recording = True
+            while Recording == True:
+                # set each frame from camera as 'frame'
+                # Create overlay of frame add transparent image at screen coordinates (10, 80)
+                #overlay = overlay_transparent(frame, overlay_t, 10, 80, (50,50))
+                ov2 = overlay_transparent(frame1, overlay_t, 5, 80, (50,50))
+                
+                # Set var now to current date/time
+                now = datetime.now()
+                
+                # Set opacity for overlay transparency, the closer to 0 the more transparent
+                opacity = 0.8
+
+                # Overlay date text
+                #cv2.putText(overlay,now.strftime("%H:%M:%S"),(30,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(1, 1, 0),2,cv2.LINE_AA)
+                #cv2.putText(ov2,now.strftime("%H:%M:%S"),(20,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),2,cv2.LINE_AA)
+                cv2.circle(ov2, (315, 5), 2, (255,0,0), cv2.FILLED)
+
+                # Combine overlay to frame, apply transparency
+                #cv2.addWeighted(overlay, opacity, frame, 1 - opacity, 0, frame)
+                cv2.addWeighted(ov2, opacity, frame1, 1 - opacity, 0, frame1)
+                #out.write(frame)
+
+                ov2 = cv2.cvtColor(ov2, cv2.COLOR_BGR2RGB)
+                ov2 =  np.rot90(ov2)
+                ov2 = cv2.flip(ov2, 0)
+                ov2= pygame.surfarray.make_surface(ov2)
+                screen.blit(ov2, (0,0))
+                pygame.display.update()
+                    
+                out.write(frame)
+                
+                if GPIO.input(27) == False:
+                    recording = False
+                
             
         if GPIO.input(23) == False:
             filename = "image_" + now.strftime("%H:%M:%S") + ".jpg"
