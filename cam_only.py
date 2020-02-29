@@ -187,9 +187,9 @@ while(True):
             cv2.imwrite(save_path, frame)
     
         if GPIO.input(27) == False:
-            main = True
             cam = False
-            wait(2)
+            wait(10)
+            main = True
 
 
 
