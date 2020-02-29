@@ -107,7 +107,8 @@ tag_date = ""
 
 show = True
 cam = False
-main = TrueRecording = False
+main = True
+Recording = False
 # Video processing
 while(True):
     if main == True:
