@@ -192,7 +192,7 @@ while(True):
                 recording = not recording
                 time.sleep(0.5)
 
-        if GPIO.input(23) == False && main == False:
+        if GPIO.input(23) == False and main == False:
             filename = "image_" + now.strftime("%H:%M:%S") + ".jpg"
             save_path = os.path.join(filename)
             cv2.imwrite(save_path, frame)
