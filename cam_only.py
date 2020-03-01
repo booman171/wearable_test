@@ -185,7 +185,7 @@ while(True):
         if GPIO.input(17) == False:
             if recording == True:
                 recording = False
-            if recording == False:
+            else if recording == False:
                 recording = True
 
         if GPIO.input(23) == False:
