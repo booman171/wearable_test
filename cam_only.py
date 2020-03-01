@@ -182,7 +182,6 @@ while(True):
         
         if GPIO.input(17) == False:
             recording = True
-            cv2.circle(ov, (315, 5), 2, (255,0,0), cv2.FILLED)
 
         if GPIO.input(23) == False:
             filename = "image_" + now.strftime("%H:%M:%S") + ".jpg"
