@@ -181,7 +181,7 @@ while(True):
         ov = pygame.surfarray.make_surface(ov)
         screen.blit(ov, (0,0))
         pygame.display.update()
-        
+        print(str(show))
         if GPIO.input(17) == False:
             if recording == True:
                 recording = False
