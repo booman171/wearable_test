@@ -184,9 +184,9 @@ while(True):
         print(str(show))
         if GPIO.input(17) == False:
             if recording == True:
-                recording = False
-            else if recording == False:
-                recording = True
+                recording = not recording
+            elif recording == False:
+                recording = not recording
 
         if GPIO.input(23) == False:
             filename = "image_" + now.strftime("%H:%M:%S") + ".jpg"
