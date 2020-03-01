@@ -184,7 +184,8 @@ while(True):
                 # set each frame from camera as 'frame'
                 # Create overlay of frame add transparent image at screen coordinates (10, 80)
                 #overlay = overlay_transparent(frame, overlay_t, 10, 80, (50,50))
-                ov2 = overlay_transparent(frame1, overlay_t, 5, 80, (50,50))
+		frame2 = frame.copy()
+                ov2 = overlay_transparent(frame2, overlay_t, 5, 80, (50,50))
                 
                 # Set var now to current date/time
                 now = datetime.now()
@@ -199,7 +200,7 @@ while(True):
 
                 # Combine overlay to frame, apply transparency
                 #cv2.addWeighted(overlay, opacity, frame, 1 - opacity, 0, frame)
-                cv2.addWeighted(ov2, opacity, frame1, 1 - opacity, 0, frame1)
+                cv2.addWeighted(ov2, opacity, frame2, 1 - opacity, 0, frame2)
                 #out.write(frame)
 
                 ov2 = cv2.cvtColor(ov2, cv2.COLOR_BGR2RGB)
@@ -209,7 +210,7 @@ while(True):
                 screen.blit(ov2, (0,0))
                 pygame.display.update()
                     
-                out.write(frame)
+                out.write(frame2)
                 
                 if GPIO.input(27) == False:
                     recording = False
