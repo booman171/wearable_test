@@ -165,7 +165,8 @@ while(True):
         cv2.putText(ov,"Snap",(255,175),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         cv2.putText(ov,"Menu",(255,230),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         if recording == True:
-            cv2.circle(ov, (315,5), 2, (255,0,0), cv2.FILLED)
+            cv2.rectangle(ov,(330,01),(333,13),(51,51,0),cv2.FILLED)
+
 
         # Combine overlay to frame, apply transparency
         #cv2.addWeighted(overlay, opacity, frame, 1 - opacity, 0, frame)
