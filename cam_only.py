@@ -167,7 +167,7 @@ while(True):
         cv2.putText(ov,"Recording",(show,20),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,255,0),1,cv2.LINE_AA)
         if recording == True:
             show = 255
-=
+            
         # Combine overlay to frame, apply transparency
         #cv2.addWeighted(overlay, opacity, frame, 1 - opacity, 0, frame)
         cv2.addWeighted(ov, opacity, frame1, 1 - opacity, 0, frame1)
