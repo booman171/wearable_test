@@ -164,7 +164,8 @@ while(True):
         cv2.putText(ov,"Rec-Bio",(245,100),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         cv2.putText(ov,"Snap",(255,175),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         cv2.putText(ov,"Menu",(255,230),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
-        
+        if recording == True:
+	    cv2.circle(ov, (315,5), 2, (255,0,0), cv2.FILLED)
 
         # Combine overlay to frame, apply transparency
         #cv2.addWeighted(overlay, opacity, frame, 1 - opacity, 0, frame)
@@ -180,42 +181,8 @@ while(True):
         
         if GPIO.input(17) == False:
             recording = True
-            while recording == True:
-                # set each frame from camera as 'frame'
-                # Create overlay of frame add transparent image at screen coordinates (10, 80)
-                #overlay = overlay_transparent(frame, overlay_t, 10, 80, (50,50))
-		frame2 = frame.copy()
-                ov2 = overlay_transparent(frame2, overlay_t, 5, 80, (50,50))
-                
-                # Set var now to current date/time
-                now = datetime.now()
-                
-                # Set opacity for overlay transparency, the closer to 0 the more transparent
-                opacity = 0.8
+            cv2.circle(ov, (315, 5), 2, (255,0,0), cv2.FILLED)
 
-                # Overlay date text
-                #cv2.putText(overlay,now.strftime("%H:%M:%S"),(30,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(1, 1, 0),2,cv2.LINE_AA)
-                #cv2.putText(ov2,now.strftime("%H:%M:%S"),(20,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),2,cv2.LINE_AA)
-                cv2.circle(ov2, (315, 5), 2, (255,0,0), cv2.FILLED)
-
-                # Combine overlay to frame, apply transparency
-                #cv2.addWeighted(overlay, opacity, frame, 1 - opacity, 0, frame)
-                cv2.addWeighted(ov2, opacity, frame2, 1 - opacity, 0, frame2)
-                #out.write(frame)
-
-                ov2 = cv2.cvtColor(ov2, cv2.COLOR_BGR2RGB)
-                ov2 =  np.rot90(ov2)
-                ov2 = cv2.flip(ov2, 0)
-                ov2= pygame.surfarray.make_surface(ov2)
-                screen.blit(ov2, (0,0))
-                pygame.display.update()
-                    
-                out.write(frame2)
-                
-                if GPIO.input(27) == False:
-                    recording = False
-                
-            
         if GPIO.input(23) == False:
             filename = "image_" + now.strftime("%H:%M:%S") + ".jpg"
             save_path = os.path.join(filename)
@@ -225,9 +192,6 @@ while(True):
             cam = False
             time.sleep(0.5)
             main = True
-
-
-
 
 	# Break loop
     if cv2.waitKey(20) & 0xFF == ord('q'):
