@@ -166,7 +166,7 @@ while(True):
         cv2.putText(ov,"Menu",(255,230),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         cv2.putText(ov,"Recording",(show,20),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,255,0),1,cv2.LINE_AA)
         if recording == True:
-            show = 250
+            show = 245
         if recording == False:
             show = 500
             
@@ -185,8 +185,10 @@ while(True):
         if GPIO.input(17) == False:
             if recording == True:
                 recording = not recording
+                time.sleep(0.5)
             elif recording == False:
                 recording = not recording
+                time.sleep(0.5)
 
         if GPIO.input(23) == False:
             filename = "image_" + now.strftime("%H:%M:%S") + ".jpg"
