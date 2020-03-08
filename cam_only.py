@@ -126,7 +126,7 @@ while(True):
     message = message.replace("\\", "")
     message = message.replace("\'", "")
     sensors = message.split(",")
-    print(message)
+    print(sensors)
     if main == True:
         # set each frame from camera as 'frame'
         #ret, frame = cap.read()
