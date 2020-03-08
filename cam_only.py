@@ -125,7 +125,8 @@ while(True):
     message = message.replace("n'", "")
     message = message.replace("\\", "")
     message = message.replace("\'", "")
-    print(message)
+    r = csv.reader([message])
+    print(list(r))
     if main == True:
         # set each frame from camera as 'frame'
         #ret, frame = cap.read()
