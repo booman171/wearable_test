@@ -147,21 +147,24 @@ while(True):
         #ov = cv2.flip(ov, 0)
         #overlay = np.flipud(overlay)
         #ov= pygame.surfarray.make_surface(ov)
-        basicfont = pygame.font.SysFont(None, 48)
-        text = basicfont.render(now.strftime("%H:%M:%S"), True, (255, 0, 0), (255, 255, 255))
-        exit_button = basicfont.render("Exit", True, (255, 0, 0), (255, 255, 255))
-        cam_button = basicfont.render("Cam", True, (255, 0, 0), (255, 255, 255))
-        temp = basicfont.render(sensors[4], True, (255, 0, 0), (255, 255, 255))
+        bigFont = pygame.font.SysFont(None, 48)
+        medFont = pygame.font.SysFont(None, 32)
+        smallFont = pygame.font.SysFont(None, 24)
+
+        clock = bigFont.render(now.strftime("%H:%M:%S"), True, (255, 0, 0), (255, 255, 255))
+        exit_button = medFont.render("Exit", True, (255, 0, 0), (255, 255, 255))
+        cam_button = medFont.render("Cam", True, (255, 0, 0), (255, 255, 255))
+        temp = medFont.render(sensors[4], True, (255, 0, 0), (255, 255, 255))
 
         #clock = text.get_rect()
         #clock.centerx = 20
         #clock.centery = 50
  
         screen.fill((255, 255, 255))
-        screen.blit(text, (5, 20))
-        screen.blit(exit_button, (5, 40))
-        screen.blit(cam_button, (5, 60))
-        screen.blit(temp, (5, 80))
+        screen.blit(clock, (5, 20))
+        screen.blit(exit_button, (5, 60))
+        screen.blit(cam_button, (5, 100))
+        screen.blit(temp, (5, 140))
         #screen.blit(ov, (0,0))
         pygame.display.update()
         
