@@ -16,7 +16,7 @@ import pygame
 from pygame.locals import *
 import sys
 import RPi.GPIO as GPIO
-# import imutils
+import serial
 
 pygame.init()
 pygame.mouse.set_visible(False)
@@ -34,9 +34,13 @@ GPIO.setup(22, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(27, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-# Create accel.csv file to write sensor data to
-f = open("accel.csv", "w", newline="")
-c=csv.writer(f)
+ser = serial.Serial('/dev/ttyACM0')
+ser.flushInput()
+
+filename = "data_" + str(time.time()) + ".csv"
+f = open(filename, "a")
+f.write("Epoch,Pitch,Roll,Yaw,Pulse,Temp" + "\n")
+f.close
 
 # Set time at start of program
 start = time.monotonic()
@@ -111,6 +115,15 @@ main = True
 recording = False
 # Video processing
 while(True):
+    # Read in Serial line
+    ser_bytes = ser.readline()
+    #ser_bytes = ser_bytes.replace("b", "")
+    message = str(ser_bytes)
+    message = message.replace("b", "")
+    message = message.replace("r", "")
+    message = message.replace("n'", "")
+    message = message.replace("\\", "")
+    message = message.replace("\'", "")
     if main == True:
         # set each frame from camera as 'frame'
         ret, frame = cap.read()
@@ -123,6 +136,7 @@ while(True):
         cv2.putText(ov,now.strftime("%H:%M:%S"),(20,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),2,cv2.LINE_AA)
         cv2.putText(ov,"Exit",(265,220),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         cv2.putText(ov,"Cam",(255,175),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+	cv2.putText(ov,message,(20,100),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         cv2.addWeighted(ov, opacity, frame1, 1 - opacity, 0, frame1)
         ov = cv2.cvtColor(ov, cv2.COLOR_BGR2RGB)
         ov =  np.rot90(ov)
