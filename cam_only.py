@@ -126,7 +126,8 @@ while(True):
     message = message.replace("\\", "")
     message = message.replace("\'", "")
     r = csv.reader([message])
-    print(list(r))
+    sensors = list(r)
+    #print(list(r))
     if main == True:
         # set each frame from camera as 'frame'
         #ret, frame = cap.read()
@@ -147,13 +148,13 @@ while(True):
         #overlay = np.flipud(overlay)
         #ov= pygame.surfarray.make_surface(ov)
         basicfont = pygame.font.SysFont(None, 48)
-        text = basicfont.render('Hello World!', True, (255, 0, 0), (255, 255, 255))
-        textrect = text.get_rect()
-        textrect.centerx = screen.get_rect().centerx
-        textrect.centery = screen.get_rect().centery
+        text = basicfont.render(now.strftime("%H:%M:%S"), True, (255, 0, 0), (255, 255, 255))
+        clock = text.get_rect()
+        clock.centerx = screen.get_rect().centerx
+        clock.centery = screen.get_rect().centery
  
         screen.fill((255, 255, 255))
-        screen.blit(text, textrect)
+        screen.blit(text, clock)
         #screen.blit(ov, (0,0))
         pygame.display.update()
         
