@@ -185,7 +185,7 @@ while(True):
         
         # Create overlay of frame add transparent image at screen coordinates (10, 80)
         #overlay = overlay_transparent(frame, overlay_t, 10, 80, (50,50))
-        ov = overlay_transparent(frame1, overlay_t, 5, 80, (50,50))
+        #ov = overlay_transparent(frame1, overlay_t, 5, 80, (50,50))
         
         # Set var now to current date/time
         now = datetime.now()
@@ -195,12 +195,12 @@ while(True):
 
         # Overlay date text
         #cv2.putText(overlay,now.strftime("%H:%M:%S"),(30,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(1, 1, 0),2,cv2.LINE_AA)
-        cv2.putText(ov,now.strftime("%H:%M:%S"),(20,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),2,cv2.LINE_AA)
-        cv2.putText(ov,"Rec",(275,55),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
-        cv2.putText(ov,"Rec-Bio",(215,120),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
-        cv2.putText(ov,"Snap",(255,175),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
-        cv2.putText(ov,"Menu",(255,230),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
-        cv2.putText(ov,"Recording",(show,20),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,0,0),1,cv2.LINE_AA)
+        cv2.putText(frame1,now.strftime("%H:%M:%S"),(20,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),2,cv2.LINE_AA)
+        cv2.putText(frame1,"Rec",(275,55),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        cv2.putText(frame1,"Rec-Bio",(215,120),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        cv2.putText(frame1,"Snap",(255,175),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        cv2.putText(frame1,"Menu",(255,230),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        cv2.putText(frame1,"Recording",(show,20),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,0,0),1,cv2.LINE_AA)
         if recording == True:
             show = 245
             out.write(frame)
@@ -209,14 +209,14 @@ while(True):
             
         # Combine overlay to frame, apply transparency
         #cv2.addWeighted(overlay, opacity, frame, 1 - opacity, 0, frame)
-        cv2.addWeighted(ov, opacity, frame1, 1 - opacity, 0, frame1)
+        #cv2.addWeighted(ov, opacity, frame1, 1 - opacity, 0, frame1)
         #out.write(frame)
 
-        ov = cv2.cvtColor(ov, cv2.COLOR_BGR2RGB)
-        ov =  np.rot90(ov)
-        ov = cv2.flip(ov, 0)
-        ov = pygame.surfarray.make_surface(ov)
-        screen.blit(ov, (0,0))
+        frame1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB)
+        frame1 =  np.rot90(frame1)
+        frame1 = cv2.flip(frame1, 0)
+        frame1 = pygame.surfarray.make_surface(frame1)
+        screen.blit(frame1, (0,0))
         pygame.display.update()
         #print(str(show))
         
