@@ -114,10 +114,13 @@ show = 400
 cam = False
 main = True
 recording = False
+ser.readline()
+time.sleep(1)
 # Video processing
 while(True):
     # Read in Serial line
     ser_bytes = ser.readline()
+    
     #ser_bytes = ser_bytes.replace("b", "")
     message = str(ser_bytes)
     message = message.replace("b", "")
