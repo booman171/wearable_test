@@ -119,58 +119,30 @@ time.sleep(1)
 temperature = 0
 # Video processing
 while(True):
-    # Read in Serial line
-    ser_bytes = ser.readline()
-    
-    #ser_bytes = ser_bytes.replace("b", "")
-    message = str(ser_bytes)
-    message = message.replace("b", "")
-    message = message.replace("r", "")
-    message = message.replace("n'", "")
-    message = message.replace("\\", "")
-    message = message.replace("\'", "")
-    sensors = message.split(",")
-    temperature = sensors[len(sensors)-1]
-    #sensors = [float(x) for x in data.split(',') if x]
-    #print(sensors[])
     if main == True:
-        # set each frame from camera as 'frame'
-        #ret, frame = cap.read()
-        #frame1 = frame.copy()
-        #screen.fill([0,0,0])
-        #ov = overlay_transparent(frame1, overlay_t, 5, 80, (50,50))
         now = datetime.now()
-        #opacity = 0.8
-        #cv2.rectangle(ov,(0,0),(320,240),(51,51,0),cv2.FILLED)
-        #cv2.putText(ov,now.strftime("%H:%M:%S"),(20,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),2,cv2.LINE_AA)
-        #cv2.putText(ov,"Exit",(265,220),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
-        #cv2.putText(ov,"Cam",(255,175),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
-        #cv2.putText(ov,message,(20,100),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
-        #cv2.addWeighted(ov, opacity, frame1, 1 - opacity, 0, frame1)
-        #ov = cv2.cvtColor(ov, cv2.COLOR_BGR2RGB)
-        #ov =  np.rot90(ov)
-        #ov = cv2.flip(ov, 0)
-        #overlay = np.flipud(overlay)
-        #ov= pygame.surfarray.make_surface(ov)
+        # Read in Serial line
+        ser_bytes = ser.readline()
+        message = str(ser_bytes)
+        message = message.replace("b", "")
+        message = message.replace("r", "")
+        message = message.replace("n'", "")
+        message = message.replace("\\", "")
+        message = message.replace("\'", "")
+        sensors = message.split(",")
+        temperature = sensors[len(sensors)-1]
         bigFont = pygame.font.SysFont(None, 48)
         medFont = pygame.font.SysFont(None, 32)
         smallFont = pygame.font.SysFont(None, 24)
-
         clock = bigFont.render(now.strftime("%H:%M:%S"), True, (255, 0, 0), (255, 255, 255))
         exit_button = medFont.render("Exit", True, (255, 0, 0), (255, 255, 255))
         cam_button = medFont.render("Cam", True, (255, 0, 0), (255, 255, 255))
         temp = medFont.render(temperature, True, (255, 0, 0), (255, 255, 255))
-
-        #clock = text.get_rect()
-        #clock.centerx = 20
-        #clock.centery = 50
- 
         screen.fill((255, 255, 255))
         screen.blit(clock, (5, 20))
         screen.blit(exit_button, (270,210))
         screen.blit(cam_button, (270,160))
         screen.blit(temp, (5, 140))
-        #screen.blit(ov, (0,0))
         pygame.display.update()
         
         if GPIO.input(23) == False:
