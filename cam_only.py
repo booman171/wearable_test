@@ -125,6 +125,7 @@ while(True):
     message = message.replace("n'", "")
     message = message.replace("\\", "")
     message = message.replace("\'", "")
+    print(message)
     if main == True:
         # set each frame from camera as 'frame'
         #ret, frame = cap.read()
@@ -205,7 +206,7 @@ while(True):
         ov = pygame.surfarray.make_surface(ov)
         screen.blit(ov, (0,0))
         pygame.display.update()
-        print(str(show))
+        #print(str(show))
         
         if GPIO.input(17) == False:
             if recording == True:
