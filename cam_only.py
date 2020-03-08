@@ -149,12 +149,19 @@ while(True):
         #ov= pygame.surfarray.make_surface(ov)
         basicfont = pygame.font.SysFont(None, 48)
         text = basicfont.render(now.strftime("%H:%M:%S"), True, (255, 0, 0), (255, 255, 255))
+        exit_button = basicfont.render("Exit", True, (255, 0, 0), (255, 255, 255))
+        cam_button = basicfont.render("Cam", True, (255, 0, 0), (255, 255, 255))
+        temp = basicfont.render(sensors[0][5]), True, (255, 0, 0), (255, 255, 255))
+
         #clock = text.get_rect()
         #clock.centerx = 20
         #clock.centery = 50
  
         screen.fill((255, 255, 255))
-        screen.blit(text, (20, 50))
+        screen.blit(text, (5, 20))
+        screen.blit(exit_button, (5, 40))
+        screen.blit(cam_button, (5, 60))
+        screen.blit(temp, (5, 80))
         #screen.blit(ov, (0,0))
         pygame.display.update()
         
