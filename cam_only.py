@@ -71,7 +71,7 @@ out = cv2.VideoWriter(save_path, video_type_cv2,frames_per_seconds,  my_res)
 
 # Read in transport image of thermostat icon
 overlay_t = cv2.imread('therm.png', -1)
-
+thermometer = pygame.image.load('therm.png')
 
 # Define method for overlaying trasnparent images
 # copied from https://gist.github.com/clungzta/b4bbb3e2aa0490b0cfcbc042184b0b4e
@@ -142,7 +142,8 @@ while(True):
         screen.blit(clock, (5, 20))
         screen.blit(exit_button, (270,210))
         screen.blit(cam_button, (270,160))
-        screen.blit(temp, (5, 140))
+        screen.blit(temp, (15, 140))
+        screen.blit(thermometer, (5,140))
         pygame.display.update()
         
         if GPIO.input(23) == False:
@@ -177,7 +178,7 @@ while(True):
         cv2.putText(frame1,"Rec-Bio",(215,120),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         cv2.putText(frame1,"Snap",(255,175),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         cv2.putText(frame1,"Menu",(255,230),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
-        cv2.putText(frame1,"Recording",(show,20),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,0,0),1,cv2.LINE_AA)
+        cv2.putText(frame1,"Recording",(show,20),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,255,0),1,cv2.LINE_AA)
         if recording == True:
             show = 245
             out.write(frame)
