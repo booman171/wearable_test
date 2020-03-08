@@ -127,7 +127,7 @@ while(True):
     message = message.replace("\'", "")
     r = csv.reader([message])
     sensors = list(r)
-    #print(list(r))
+    print(sensors)
     if main == True:
         # set each frame from camera as 'frame'
         #ret, frame = cap.read()
@@ -151,7 +151,7 @@ while(True):
         text = basicfont.render(now.strftime("%H:%M:%S"), True, (255, 0, 0), (255, 255, 255))
         exit_button = basicfont.render("Exit", True, (255, 0, 0), (255, 255, 255))
         cam_button = basicfont.render("Cam", True, (255, 0, 0), (255, 255, 255))
-        temp = basicfont.render(sensors[1]), True, (255, 0, 0), (255, 255, 255))
+        #temp = basicfont.render(sensors[1]), True, (255, 0, 0), (255, 255, 255))
 
         #clock = text.get_rect()
         #clock.centerx = 20
