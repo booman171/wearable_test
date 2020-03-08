@@ -144,7 +144,7 @@ while(True):
         screen.blit(exit_button, (270,210))
         screen.blit(cam_button, (270,160))
         screen.blit(temp, (30, 210))
-        screen.blit(thermometer, (5,210))
+        screen.blit(thermometer, (3,200))
         pygame.display.update()
         
         if GPIO.input(23) == False:
