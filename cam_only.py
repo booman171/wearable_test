@@ -138,13 +138,13 @@ while(True):
         clock = bigFont.render(now.strftime("%H:%M:%S"), True, (255, 0, 0), (255, 255, 255))
         exit_button = medFont.render("Exit", True, (255, 0, 0), (255, 255, 255))
         cam_button = medFont.render("Cam", True, (255, 0, 0), (255, 255, 255))
-        temp = medFont.render(temperature, True, (255, 0, 0), (255, 255, 255))
+        temp = medFont.render(temperature + " C", True, (255, 0, 0), (255, 255, 255))
         screen.fill((255, 255, 255))
         screen.blit(clock, (5, 20))
         screen.blit(exit_button, (270,210))
         screen.blit(cam_button, (270,160))
         screen.blit(temp, (30, 210))
-        screen.blit(thermometer, (3,200))
+        screen.blit(thermometer, (1,200))
         pygame.display.update()
         
         if GPIO.input(23) == False:
