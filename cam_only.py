@@ -108,6 +108,7 @@ def overlay_transparent(background_img, img_to_overlay_t, x, y, overlay_size=Non
         return bg_img
 
 tag_date = ""
+basicfont = pygame.font.SysFont(None, 48)
 
 show = 400
 cam = False
@@ -126,24 +127,32 @@ while(True):
     message = message.replace("\'", "")
     if main == True:
         # set each frame from camera as 'frame'
-        ret, frame = cap.read()
-        frame1 = frame.copy()
-        screen.fill([0,0,0])
-        ov = overlay_transparent(frame1, overlay_t, 5, 80, (50,50))
+        #ret, frame = cap.read()
+        #frame1 = frame.copy()
+        #screen.fill([0,0,0])
+        #ov = overlay_transparent(frame1, overlay_t, 5, 80, (50,50))
         now = datetime.now()
-        opacity = 0.8
-        cv2.rectangle(ov,(0,0),(320,240),(51,51,0),cv2.FILLED)
-        cv2.putText(ov,now.strftime("%H:%M:%S"),(20,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),2,cv2.LINE_AA)
-        cv2.putText(ov,"Exit",(265,220),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
-        cv2.putText(ov,"Cam",(255,175),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
-        cv2.putText(ov,message,(20,100),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
-        cv2.addWeighted(ov, opacity, frame1, 1 - opacity, 0, frame1)
-        ov = cv2.cvtColor(ov, cv2.COLOR_BGR2RGB)
-        ov =  np.rot90(ov)
-        ov = cv2.flip(ov, 0)
+        #opacity = 0.8
+        #cv2.rectangle(ov,(0,0),(320,240),(51,51,0),cv2.FILLED)
+        #cv2.putText(ov,now.strftime("%H:%M:%S"),(20,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),2,cv2.LINE_AA)
+        #cv2.putText(ov,"Exit",(265,220),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        #cv2.putText(ov,"Cam",(255,175),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        #cv2.putText(ov,message,(20,100),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        #cv2.addWeighted(ov, opacity, frame1, 1 - opacity, 0, frame1)
+        #ov = cv2.cvtColor(ov, cv2.COLOR_BGR2RGB)
+        #ov =  np.rot90(ov)
+        #ov = cv2.flip(ov, 0)
         #overlay = np.flipud(overlay)
-        ov= pygame.surfarray.make_surface(ov)
-        screen.blit(ov, (0,0))
+        #ov= pygame.surfarray.make_surface(ov)
+        basicfont = pygame.font.SysFont(None, 48)
+        text = basicfont.render('Hello World!', True, (255, 0, 0), (255, 255, 255))
+        textrect = text.get_rect()
+        textrect.centerx = screen.get_rect().centerx
+        textrect.centery = screen.get_rect().centery
+ 
+        screen.fill((255, 255, 255))
+        screen.blit(text, textrect)
+        #screen.blit(ov, (0,0))
         pygame.display.update()
         
         if GPIO.input(23) == False:
