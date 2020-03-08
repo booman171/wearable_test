@@ -116,6 +116,7 @@ main = True
 recording = False
 ser.readline()
 time.sleep(1)
+temperature = 0
 # Video processing
 while(True):
     # Read in Serial line
@@ -129,6 +130,7 @@ while(True):
     message = message.replace("\\", "")
     message = message.replace("\'", "")
     sensors = message.split(",")
+    temperature = sensors[len(sensors)-1]
     #sensors = [float(x) for x in data.split(',') if x]
     #print(sensors[])
     if main == True:
@@ -157,7 +159,7 @@ while(True):
         clock = bigFont.render(now.strftime("%H:%M:%S"), True, (255, 0, 0), (255, 255, 255))
         exit_button = medFont.render("Exit", True, (255, 0, 0), (255, 255, 255))
         cam_button = medFont.render("Cam", True, (255, 0, 0), (255, 255, 255))
-        temp = medFont.render(sensors[4], True, (255, 0, 0), (255, 255, 255))
+        temp = medFont.render(temperature, True, (255, 0, 0), (255, 255, 255))
 
         #clock = text.get_rect()
         #clock.centerx = 20
