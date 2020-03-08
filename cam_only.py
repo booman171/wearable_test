@@ -72,6 +72,7 @@ out = cv2.VideoWriter(save_path, video_type_cv2,frames_per_seconds,  my_res)
 # Read in transport image of thermostat icon
 overlay_t = cv2.imread('therm.png', -1)
 thermometer = pygame.image.load('therm.png')
+thermometer = pygame.transform.rotozoom(thermometer, 0, 0.1)
 
 # Define method for overlaying trasnparent images
 # copied from https://gist.github.com/clungzta/b4bbb3e2aa0490b0cfcbc042184b0b4e
