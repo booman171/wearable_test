@@ -136,7 +136,7 @@ while(True):
         cv2.putText(ov,now.strftime("%H:%M:%S"),(20,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),2,cv2.LINE_AA)
         cv2.putText(ov,"Exit",(265,220),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         cv2.putText(ov,"Cam",(255,175),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
-	cv2.putText(ov,message,(20,100),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        cv2.putText(ov,message,(20,100),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         cv2.addWeighted(ov, opacity, frame1, 1 - opacity, 0, frame1)
         ov = cv2.cvtColor(ov, cv2.COLOR_BGR2RGB)
         ov =  np.rot90(ov)
