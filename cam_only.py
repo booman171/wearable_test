@@ -162,8 +162,8 @@ while(True):
  
         screen.fill((255, 255, 255))
         screen.blit(clock, (5, 20))
-        screen.blit(exit_button, (5, 60))
-        screen.blit(cam_button, (5, 100))
+        screen.blit(exit_button, (265,220))
+        screen.blit(cam_button, (255,175))
         screen.blit(temp, (5, 140))
         #screen.blit(ov, (0,0))
         pygame.display.update()
