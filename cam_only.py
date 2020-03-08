@@ -162,7 +162,7 @@ while(True):
         screen.fill([0,0,0])
         
         # Create overlay of frame add transparent image at screen coordinates (10, 80)
-        overlay = overlay_transparent(frame, overlay_t, 10, 80, (50,50))
+        #overlay = overlay_transparent(frame, overlay_t, 10, 80, (50,50))
         ov = overlay_transparent(frame1, overlay_t, 5, 80, (50,50))
         
         # Set var now to current date/time
