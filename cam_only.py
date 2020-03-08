@@ -150,8 +150,8 @@ while(True):
         basicfont = pygame.font.SysFont(None, 48)
         text = basicfont.render(now.strftime("%H:%M:%S"), True, (255, 0, 0), (255, 255, 255))
         clock = text.get_rect()
-        clock.centerx = screen.get_rect().centerx
-        clock.centery = screen.get_rect().centery
+        clock.centerx = 20
+        clock.centery = 50
  
         screen.fill((255, 255, 255))
         screen.blit(text, clock)
