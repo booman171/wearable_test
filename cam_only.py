@@ -148,7 +148,7 @@ while(True):
         r = medFont.render("Roll: " + roll, True, (255, 0, 0), (255, 255, 255))
         y = medFont.render("Yaw: " + yaw, True, (255, 0, 0), (255, 255, 255))
         screen.fill((255, 255, 255))
-        screen.blit(clock, (5, 20))
+        screen.blit(clock, (5, 5))
         screen.blit(exit_button, (270,210))
         screen.blit(cam_button, (270,160))
         screen.blit(temp, (30, 190))
