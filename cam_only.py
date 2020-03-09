@@ -144,7 +144,7 @@ while(True):
         cam_button = medFont.render("Cam", True, (255, 0, 0), (255, 255, 255))
         temp = medFont.render(temperature + " C", True, (255, 0, 0), (255, 255, 255))
         ecg = medFont.render("ECG: " + heart, True, (255, 0, 0), (255, 255, 255))
-        sf = medFont.render("Sensor Fusion: " + pitch + ", " + roll + ", " + yaw, True, (255, 0, 0), (255, 255, 255))
+        sf = medFont.render("P-R-Y: " + pitch + ", " + roll + ", " + yaw, True, (255, 0, 0), (255, 255, 255))
         screen.fill((255, 255, 255))
         screen.blit(clock, (5, 20))
         screen.blit(exit_button, (270,210))
