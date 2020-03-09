@@ -132,6 +132,10 @@ while(True):
         message = message.replace("\'", "")
         sensors = message.split(",")
         temperature = sensors[len(sensors)-1]
+        heart = sensors[en(sensors)-2]
+        pitch = sensors[len(sensors)-3]
+        roll = sensors[len(sensors)-4]
+        yaw = sensors[len(sensors)-5]
         bigFont = pygame.font.SysFont(None, 48)
         medFont = pygame.font.SysFont(None, 32)
         smallFont = pygame.font.SysFont(None, 24)
@@ -139,12 +143,16 @@ while(True):
         exit_button = medFont.render("Exit", True, (255, 0, 0), (255, 255, 255))
         cam_button = medFont.render("Cam", True, (255, 0, 0), (255, 255, 255))
         temp = medFont.render(temperature + " C", True, (255, 0, 0), (255, 255, 255))
+        ecg = medFont.render("ECG: " + heart, True, (255, 0, 0), (255, 255, 255))
+        sf = medFont.render("Sensor Fusion: " + pitch + ", " + roll + ", " + yaw, True, (255, 0, 0), (255, 255, 255))
         screen.fill((255, 255, 255))
         screen.blit(clock, (5, 20))
         screen.blit(exit_button, (270,210))
         screen.blit(cam_button, (270,160))
-        screen.blit(temp, (30, 210))
-        screen.blit(thermometer, (1,200))
+        screen.blit(temp, (30, 190))
+        screen.blit(thermometer, (1,180))
+        screen.blit(ecg, (10,160))
+        screen.blit(sf, (10,200))
         pygame.display.update()
         
         if GPIO.input(23) == False:
