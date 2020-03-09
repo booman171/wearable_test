@@ -132,7 +132,7 @@ while(True):
         message = message.replace("\'", "")
         sensors = message.split(",")
         temperature = sensors[len(sensors)-1]
-        heart = sensors[en(sensors)-2]
+        heart = sensors[len(sensors)-2]
         pitch = sensors[len(sensors)-3]
         roll = sensors[len(sensors)-4]
         yaw = sensors[len(sensors)-5]
