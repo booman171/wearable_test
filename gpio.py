@@ -15,15 +15,18 @@ from __future__ import absolute_import
 
 import re
 import logging
-
+import enum
+from common import TestMetaWearBase
+import time
 from pymetawear import libmetawear
-
+from ctypes import c_uint8
 from pymetawear import add_stream_logger, modules
 from pymetawear.client import MetaWearClient
 from mbientlab.metawear.cbindings import GpioPinChangeType, GpioPullMode, \
     GpioAnalogReadParameters, GpioAnalogReadMode
 from pymetawear.modules.base import PyMetaWearModule, data_handler
-
+from ctypes import byref, create_string_buffer
+from mbientlab.metawear.cbindings import *
 log = logging.getLogger(__name__)
 
 def handle_gpio_notification(data):
@@ -46,6 +49,8 @@ class GpioModule(PyMetaWearModule):
         super(GpioModule, self).__init__(board)
         self.module_id = module_id
         
+        #uint8_t c_pin
+        # = (unit8_t)0
         self.current_pin = 0
         self.current_mode = 0
         self.current_read = 0
@@ -53,7 +58,7 @@ class GpioModule(PyMetaWearModule):
         self.pin = {}
         self.mode = {}
         self.read = {}
-        
+        self.sensor_data_handler= FnVoid_VoidP_DataP(self.sensorDataHandler)
         gpio_pin_class = GpioPinChangeType
         gpio_mode_class = GpioPullMode
         gpio_read_class = GpioAnalogReadMode
@@ -97,7 +102,19 @@ class GpioModule(PyMetaWearModule):
     @property
     def data_signal(self):
         # TODO: Fix this pin issue!
-        return libmetawear.mbl_mw_gpio_get_pin_monitor_data_signal(self.board, '0')
+        #return libmetawear.mbl_mw_gpio_get_analog_input_data_signal(self.board, self.pin)
+        tests= [
+            {'expected': [0x05, 0x87, 0x02], 'mode': GpioAnalogReadMode.ADC, 'pin': 2}
+        ]
+        #return libmetawear.mbl_mw_gpio_get_analog_input_data_signal(self.board, 0)
+        for test in tests:
+            an_signal= libmetawear.mbl_mw_gpio_get_analog_input_data_signal(self.board, test['pin'], test['mode'])
+            print("dvfvd" + str(an_signal))
+            self.pin = test['pin']
+            libmetawear.mbl_mw_datasignal_subscribe(an_signal, None, self.sensorDataHandler)
+            print("fbdbdfbsfvbdfb" + str(libmetawear.mbl_mw_datasignal_read(an_signal)))
+        return an_signal
+        #return libmetawear.mbl_mw_gpio_get_pin_monitor_data_signal(self.board, c_uint8(0))
         #if self.analog:
         #    return libmetawear.mbl_mw_gpio_get_analog_input_data_signal(self.board, 0)
         #elif self.digital:
@@ -107,6 +124,68 @@ class GpioModule(PyMetaWearModule):
         #    return libmetawear.mbl_mw_gpio_get_pin_monitor_data_signal(
         #        self.board)
 
+    def sensorDataHandler(self, context, data):
+	if (data.contents.type_id == DataTypeId.UINT32):
+		data_ptr= cast(data.contents.value, POINTER(c_uint))
+		self.data_uint32= c_uint()
+		self.data_uint32.value= data_ptr.contents.value
+		self.data = self.data_uint32
+	elif (data.contents.type_id == DataTypeId.INT32 or data.contents.type_id == DataTypeId.SENSOR_ORIENTATION):
+		data_ptr= cast(data.contents.value, POINTER(c_int))
+		self.data_int32= c_int()
+		self.data_int32.value= data_ptr.contents.value
+		self.data = self.data_int32
+	elif (data.contents.type_id == DataTypeId.FLOAT):
+		data_ptr= cast(data.contents.value, POINTER(c_float))
+		self.data_float= c_float()
+		self.data_float.value= data_ptr.contents.value
+		self.data = self.data_float
+	elif (data.contents.type_id == DataTypeId.CARTESIAN_FLOAT):
+		data_ptr= cast(data.contents.value, POINTER(CartesianFloat))
+		self.data_cartesian_float= copy.deepcopy(data_ptr.contents)
+		self.data = self.data_cartesian_float
+	elif (data.contents.type_id == DataTypeId.BATTERY_STATE):
+		data_ptr= cast(data.contents.value, POINTER(BatteryState))
+		self.data_battery_state= copy.deepcopy(data_ptr.contents)
+		self.data = self.data_battery_state
+	elif (data.contents.type_id == DataTypeId.BYTE_ARRAY):
+		data_ptr= cast(data.contents.value, POINTER(c_ubyte * data.contents.length))
+
+		self.data_byte_array= []
+		for i in range(0, data.contents.length):
+			self.data_byte_array.append(data_ptr.contents[i])
+
+		self.data = self.data_byte_array
+	elif (data.contents.type_id == DataTypeId.TCS34725_ADC):
+		data_ptr= cast(data.contents.value, POINTER(Tcs34725ColorAdc))
+		self.data_tcs34725_adc= copy.deepcopy(data_ptr.contents)
+		self.data = self.data_tcs34725_adc
+	elif (data.contents.type_id == DataTypeId.EULER_ANGLE):
+		data_ptr= cast(data.contents.value, POINTER(EulerAngles))
+		self.data= copy.deepcopy(data_ptr.contents)
+	elif (data.contents.type_id == DataTypeId.QUATERNION):
+		data_ptr= cast(data.contents.value, POINTER(Quaternion))
+		self.data= copy.deepcopy(data_ptr.contents)
+	elif (data.contents.type_id == DataTypeId.CORRECTED_CARTESIAN_FLOAT):
+		data_ptr= cast(data.contents.value, POINTER(CorrectedCartesianFloat))
+		self.data= copy.deepcopy(data_ptr.contents)
+	elif (data.contents.type_id == DataTypeId.OVERFLOW_STATE):
+		data_ptr= cast(data.contents.value, POINTER(OverflowState))
+		self.data= copy.deepcopy(data_ptr.contents)
+	elif (data.contents.type_id == DataTypeId.STRING):
+		data_ptr= cast(data.contents.value, c_char_p)
+		self.data = data_ptr.value.decode("ascii")
+	elif (data.contents.type_id == DataTypeId.BOSCH_ANY_MOTION):
+		data_ptr = cast(data.contents.value, POINTER(BoschAnyMotion))
+		self.data = copy.deepcopy(data_ptr.contents)
+	elif (data.contents.type_id == DataTypeId.CALIBRATION_STATE):
+		data_ptr = cast(data.contents.value, POINTER(CalibrationState))
+		self.data = copy.deepcopy(data_ptr.contents)
+	elif(data.contents.type_id == DataTypeId.BOSCH_TAP):
+		data_ptr = cast(data.contents.value, POINTER(BoschTap))
+		self.data = copy.deepcopy(data_ptr.contents)
+	else:
+		raise RuntimeError('Unrecognized data type id: ' + str(data.contents.type_id))
     def _get_pin(self, value):
         if value.lower() in self.pin:
             return self.pin.get(value.lower())
@@ -199,11 +278,11 @@ class GpioModule(PyMetaWearModule):
 
     def start(self, pin=None):
         """Switches the gpio to active mode."""
-        libmetawear.mbl_mw_gpio_start_pin_monitoring(self.board, pin)
+        libmetawear.mbl_mw_gpio_start_pin_monitoring(self.board, self.pin)
 
     def stop(self, pin=None):
         """Switches the gpio to standby mode."""
-        libmetawear.mbl_mw_gpio_stop_pin_monitoring(self.board, pin)
+        libmetawear.mbl_mw_gpio_stop_pin_monitoring(self.board, self.pin)
 
 client = MetaWearClient("CC:3E:36:3A:4B:50", debug=True)
 gp = GpioModule(client.board, libmetawear.mbl_mw_metawearboard_lookup_module(client.board, modules.Modules.MBL_MW_MODULE_GPIO))
@@ -214,4 +293,7 @@ for k, v in settings.items():
     print(k, v)
 
 gp.set_settings(pin=0, rmode='ADC', pmode=None, ptype=None)
+print("Current: " + gp.get_current_settings())
 gp.notifications(handle_gpio_notification)
+time.sleep(10.0)
+
