@@ -125,67 +125,68 @@ class GpioModule(PyMetaWearModule):
         #        self.board)
 
     def sensorDataHandler(self, context, data):
-	if (data.contents.type_id == DataTypeId.UINT32):
-		data_ptr= cast(data.contents.value, POINTER(c_uint))
-		self.data_uint32= c_uint()
-		self.data_uint32.value= data_ptr.contents.value
-		self.data = self.data_uint32
-	elif (data.contents.type_id == DataTypeId.INT32 or data.contents.type_id == DataTypeId.SENSOR_ORIENTATION):
-		data_ptr= cast(data.contents.value, POINTER(c_int))
-		self.data_int32= c_int()
-		self.data_int32.value= data_ptr.contents.value
-		self.data = self.data_int32
-	elif (data.contents.type_id == DataTypeId.FLOAT):
-		data_ptr= cast(data.contents.value, POINTER(c_float))
-		self.data_float= c_float()
-		self.data_float.value= data_ptr.contents.value
-		self.data = self.data_float
-	elif (data.contents.type_id == DataTypeId.CARTESIAN_FLOAT):
-		data_ptr= cast(data.contents.value, POINTER(CartesianFloat))
-		self.data_cartesian_float= copy.deepcopy(data_ptr.contents)
-		self.data = self.data_cartesian_float
-	elif (data.contents.type_id == DataTypeId.BATTERY_STATE):
-		data_ptr= cast(data.contents.value, POINTER(BatteryState))
-		self.data_battery_state= copy.deepcopy(data_ptr.contents)
-		self.data = self.data_battery_state
-	elif (data.contents.type_id == DataTypeId.BYTE_ARRAY):
-		data_ptr= cast(data.contents.value, POINTER(c_ubyte * data.contents.length))
+        if (data.contents.type_id == DataTypeId.UINT32):
+            data_ptr= cast(data.contents.value, POINTER(c_uint))
+            self.data_uint32= c_uint()
+            self.data_uint32.value= data_ptr.contents.value
+            self.data = self.data_uint32
+        elif (data.contents.type_id == DataTypeId.INT32 or data.contents.type_id == DataTypeId.SENSOR_ORIENTATION):
+            data_ptr= cast(data.contents.value, POINTER(c_int))
+            self.data_int32= c_int()
+            self.data_int32.value= data_ptr.contents.value
+            self.data = self.data_int32
+        elif (data.contents.type_id == DataTypeId.FLOAT):
+            data_ptr= cast(data.contents.value, POINTER(c_float))
+            self.data_float= c_float()
+            self.data_float.value= data_ptr.contents.value
+            self.data = self.data_float
+        elif (data.contents.type_id == DataTypeId.CARTESIAN_FLOAT):
+            data_ptr= cast(data.contents.value, POINTER(CartesianFloat))
+            self.data_cartesian_float= copy.deepcopy(data_ptr.contents)
+            self.data = self.data_cartesian_float
+        elif (data.contents.type_id == DataTypeId.BATTERY_STATE):
+            data_ptr= cast(data.contents.value, POINTER(BatteryState))
+            self.data_battery_state= copy.deepcopy(data_ptr.contents)
+            self.data = self.data_battery_state
+        elif (data.contents.type_id == DataTypeId.BYTE_ARRAY):
+            data_ptr= cast(data.contents.value, POINTER(c_ubyte * data.contents.length))
 
-		self.data_byte_array= []
-		for i in range(0, data.contents.length):
-			self.data_byte_array.append(data_ptr.contents[i])
+            self.data_byte_array= []
+            for i in range(0, data.contents.length):
+                self.data_byte_array.append(data_ptr.contents[i])
 
-		self.data = self.data_byte_array
-	elif (data.contents.type_id == DataTypeId.TCS34725_ADC):
-		data_ptr= cast(data.contents.value, POINTER(Tcs34725ColorAdc))
-		self.data_tcs34725_adc= copy.deepcopy(data_ptr.contents)
-		self.data = self.data_tcs34725_adc
-	elif (data.contents.type_id == DataTypeId.EULER_ANGLE):
-		data_ptr= cast(data.contents.value, POINTER(EulerAngles))
-		self.data= copy.deepcopy(data_ptr.contents)
-	elif (data.contents.type_id == DataTypeId.QUATERNION):
-		data_ptr= cast(data.contents.value, POINTER(Quaternion))
-		self.data= copy.deepcopy(data_ptr.contents)
-	elif (data.contents.type_id == DataTypeId.CORRECTED_CARTESIAN_FLOAT):
-		data_ptr= cast(data.contents.value, POINTER(CorrectedCartesianFloat))
-		self.data= copy.deepcopy(data_ptr.contents)
-	elif (data.contents.type_id == DataTypeId.OVERFLOW_STATE):
-		data_ptr= cast(data.contents.value, POINTER(OverflowState))
-		self.data= copy.deepcopy(data_ptr.contents)
-	elif (data.contents.type_id == DataTypeId.STRING):
-		data_ptr= cast(data.contents.value, c_char_p)
-		self.data = data_ptr.value.decode("ascii")
-	elif (data.contents.type_id == DataTypeId.BOSCH_ANY_MOTION):
-		data_ptr = cast(data.contents.value, POINTER(BoschAnyMotion))
-		self.data = copy.deepcopy(data_ptr.contents)
-	elif (data.contents.type_id == DataTypeId.CALIBRATION_STATE):
-		data_ptr = cast(data.contents.value, POINTER(CalibrationState))
-		self.data = copy.deepcopy(data_ptr.contents)
-	elif(data.contents.type_id == DataTypeId.BOSCH_TAP):
-		data_ptr = cast(data.contents.value, POINTER(BoschTap))
-		self.data = copy.deepcopy(data_ptr.contents)
-	else:
-		raise RuntimeError('Unrecognized data type id: ' + str(data.contents.type_id))
+            self.data = self.data_byte_array
+        elif (data.contents.type_id == DataTypeId.TCS34725_ADC):
+            data_ptr= cast(data.contents.value, POINTER(Tcs34725ColorAdc))
+            self.data_tcs34725_adc= copy.deepcopy(data_ptr.contents)
+            self.data = self.data_tcs34725_adc
+        elif (data.contents.type_id == DataTypeId.EULER_ANGLE):
+            data_ptr= cast(data.contents.value, POINTER(EulerAngles))
+            self.data= copy.deepcopy(data_ptr.contents)
+        elif (data.contents.type_id == DataTypeId.QUATERNION):
+            data_ptr= cast(data.contents.value, POINTER(Quaternion))
+            self.data= copy.deepcopy(data_ptr.contents)
+        elif (data.contents.type_id == DataTypeId.CORRECTED_CARTESIAN_FLOAT):
+            data_ptr= cast(data.contents.value, POINTER(CorrectedCartesianFloat))
+            self.data= copy.deepcopy(data_ptr.contents)
+        elif (data.contents.type_id == DataTypeId.OVERFLOW_STATE):
+            data_ptr= cast(data.contents.value, POINTER(OverflowState))
+            self.data= copy.deepcopy(data_ptr.contents)
+        elif (data.contents.type_id == DataTypeId.STRING):
+            data_ptr= cast(data.contents.value, c_char_p)
+            self.data = data_ptr.value.decode("ascii")
+        elif (data.contents.type_id == DataTypeId.BOSCH_ANY_MOTION):
+            data_ptr = cast(data.contents.value, POINTER(BoschAnyMotion))
+            self.data = copy.deepcopy(data_ptr.contents)
+        elif (data.contents.type_id == DataTypeId.CALIBRATION_STATE):
+            data_ptr = cast(data.contents.value, POINTER(CalibrationState))
+            self.data = copy.deepcopy(data_ptr.contents)
+        elif(data.contents.type_id == DataTypeId.BOSCH_TAP):
+            data_ptr = cast(data.contents.value, POINTER(BoschTap))
+            self.data = copy.deepcopy(data_ptr.contents)
+        else:
+            raise RuntimeError('Unrecognized data type id: ' + str(data.contents.type_id))
+            
     def _get_pin(self, value):
         if value.lower() in self.pin:
             return self.pin.get(value.lower())
