@@ -60,8 +60,7 @@ cap = cv2.VideoCapture(0)
 video_type_cv2 = cv2.VideoWriter_fourcc(*'XVID')
 # Save video.avi to current directory
 save_path = os.path.join(filename)
-# Create video
-out = cv2.VideoWriter(save_path, video_type_cv2,frames_per_seconds,  my_res)
+
 
 # Read in transport image of thermostat icon
 overlay_t = cv2.imread('therm.png', -1)
@@ -197,12 +196,10 @@ while(True):
         cv2.putText(frame1,"Snap",(255,175),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         cv2.putText(frame1,"Menu",(255,230),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         cv2.putText(frame1,"Recording",(show,20),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,255),1,cv2.LINE_AA)
-        #if recording == True:
-        #    show = 245
-        #    out.write(frame)
-        #if recording == False:
-        #    show = 500
-            
+        
+        if recording == True:
+            out.write(frame)
+
         # Combine overlay to frame, apply transparency
         #cv2.addWeighted(overlay, opacity, frame, 1 - opacity, 0, frame)
         #cv2.addWeighted(ov, opacity, frame1, 1 - opacity, 0, frame1)
@@ -224,6 +221,8 @@ while(True):
             elif recording == False:
                 recording = not recording
                 show = 245
+                # Create video
+                out = cv2.VideoWriter(save_path, video_type_cv2,frames_per_seconds,  my_res)
                 time.sleep(0.5)
         
         if GPIO.input(22) == False:
