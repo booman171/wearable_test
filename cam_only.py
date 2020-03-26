@@ -40,7 +40,7 @@ ser = serial.Serial('/dev/ttyACM0', 115200, timeout=0)
 
 filename = "data_" + str(time.time()) + ".csv"
 f = open(filename, "a")
-f.write("Epoch,Pitch,Roll,Yaw,Pulse,Temp" + "\n")
+f.write("Epoch,Pitch,Roll,Yaw,Temp,Pulse" + "\n")
 f.close
 
 # Set time at start of program
@@ -48,25 +48,18 @@ start = time.monotonic()
 timestr = time.strftime("%Y%m%d-%H%M%S")
 # Set declination based on location http://www.magnetic-declination.com/
 declination = -0.106988683
-
 # Set filename video.avi for recording camera output
 filename = 'video' + timestr + '.avi' # .avi .mp4
-
 # Set picamera standard frame rate
 frames_per_seconds = 30.0
-
 # Set recording resolution
 my_res = (640, 480) #'480p' # 1080p
-
 # Read from default (0) camera
 cap = cv2.VideoCapture(0)
-
 # Set video format
 video_type_cv2 = cv2.VideoWriter_fourcc(*'XVID')
-
 # Save video.avi to current directory
 save_path = os.path.join(filename)
-
 # Create video
 out = cv2.VideoWriter(save_path, video_type_cv2,frames_per_seconds,  my_res)
 
@@ -115,13 +108,7 @@ def read_from_port():
     while True:
         if(ser.inWaiting()>0):
             ser_bytes = ser.read(ser.inWaiting()).decode('ascii')
-            #ser_bytes = ser.readline()
             message = str(ser_bytes)
-            #message = message.replace("b", "")
-            #message = message.replace("r", "")
-            #message = message.replace("n'", "")
-            #message = message.replace("\\", "")
-            #message = message.replace("\'", "")
             sensors = message.split(",")
             global temperature
             temperature = sensors[len(sensors)-2]
@@ -135,10 +122,6 @@ def read_from_port():
             yaw = sensors[len(sensors)-3]
             handle_data(heart)
         time.sleep(0.01)
-        #print("test")
-        #reading = ser.readline().decode()
-        #handle_data(reading)
-
 thread = threading.Thread(target=read_from_port)
 thread.start()
 
@@ -146,45 +129,17 @@ tag_date = ""
 basicfont = pygame.font.SysFont(None, 48)
 
 show = 400
+show2 = 400
 cam = False
 main = True
 recording = False
+showSensors = False
 ser.readline()
 time.sleep(1)
-#temperature = 0
 # Video processing
 while(True):
-    #ser_bytes = ser.readline()
-    #message = str(ser_bytes)
-    #message = message.replace("b", "")
-    #message = message.replace("r", "")
-    #message = message.replace("n'", "")
-    #message = message.replace("\\", "")
-    #message = message.replace("\'", "")
-    #sensors = message.split(",")
-    #temperature = sensors[len(sensors)-1]
-    #heart = sensors[len(sensors)-2]
-    #pitch = sensors[len(sensors)-3]
-    #roll = sensors[len(sensors)-4]
-    #yaw = sensors[len(sensors)-5]
-    
     if main == True:
         now = datetime.now()
-        # Read in Serial line
-        #ser_bytes = ser.readline()
-        #message = str(ser_bytes)
-        #message = message.replace("b", "")
-        #message = message.replace("r", "")
-        #message = message.replace("n'", "")
-        #message = message.replace("\\", "")
-        #message = message.replace("\'", "")
-        #sensors = message.split(",")
-        #temperature = sensors[len(sensors)-1]
-        #heart = sensors[len(sensors)-2]
-        #pitch = sensors[len(sensors)-3]
-        #roll = sensors[len(sensors)-4]
-        #yaw = sensors[len(sensors)-5]
-        #print("Pitch: " + str(pitch) + ", Roll: " + str(roll) + ", Yaw: " + str(yaw))
         bigFont = pygame.font.SysFont(None, 48)
         medFont = pygame.font.SysFont(None, 32)
         smallFont = pygame.font.SysFont(None, 24)
@@ -222,20 +177,6 @@ while(True):
         ret, frame = cap.read()
         frame1 = frame.copy()
         screen.fill([0,0,0])
-        #ser_bytes = ser.readline()
-        #message = str(ser_bytes)
-        #message = message.replace("b", "")
-        #message = message.replace("r", "")
-        #message = message.replace("n'", "")
-        #message = message.replace("\\", "")
-        #message = message.replace("\'", "")
-        #sensors = message.split(",")
-        #temperature = sensors[len(sensors)-1]
-        #heart = sensors[len(sensors)-2]
-        #pitch = sensors[len(sensors)-3]
-        #roll = sensors[len(sensors)-4]
-        #yaw = sensors[len(sensors)-5]
-        #print(str(pitch) + ", " + str(roll) + ", " + str(yaw))
         # Create overlay of frame add transparent image at screen coordinates (10, 80)
         #overlay = overlay_transparent(frame, overlay_t, 10, 80, (50,50))
         #ov = overlay_transparent(frame1, overlay_t, 5, 80, (50,50))
@@ -250,15 +191,17 @@ while(True):
         #cv2.putText(overlay,now.strftime("%H:%M:%S"),(30,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(1, 1, 0),2,cv2.LINE_AA)
         cv2.putText(frame1,now.strftime("%H:%M:%S"),(20,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),2,cv2.LINE_AA)
         cv2.putText(frame1,"Rec",(275,55),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        cv2.putText(frame1,"Temp: ",(show2,70),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        cv2.putText(frame1,"HR: ",(show2,90),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         cv2.putText(frame1,"Rec-Bio",(215,120),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         cv2.putText(frame1,"Snap",(255,175),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         cv2.putText(frame1,"Menu",(255,230),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         cv2.putText(frame1,"Recording",(show,20),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,255),1,cv2.LINE_AA)
-        if recording == True:
-            show = 245
-            out.write(frame)
-        if recording == False:
-            show = 500
+        #if recording == True:
+        #    show = 245
+        #    out.write(frame)
+        #if recording == False:
+        #    show = 500
             
         # Combine overlay to frame, apply transparency
         #cv2.addWeighted(overlay, opacity, frame, 1 - opacity, 0, frame)
@@ -276,11 +219,23 @@ while(True):
         if GPIO.input(17) == False:
             if recording == True:
                 recording = not recording
+                show = 500
                 time.sleep(0.5)
             elif recording == False:
                 recording = not recording
+                show = 245
                 time.sleep(0.5)
-
+        
+        if GPIO.input(22) == False:
+            if showSensors == True:
+                showSensors = not showSensors
+                show2 = 500
+                time.sleep(0.5)
+            elif showSensors == False:
+                showSensors = not showSensors
+                show2 = 40
+                time.sleep(0.5)
+                
         if GPIO.input(23) == False and main == False:
             filename = "image_" + now.strftime("%H:%M:%S") + ".jpg"
             save_path = os.path.join(filename)
