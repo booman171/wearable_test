@@ -3,6 +3,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+import threading
 import os
 import numpy as np
 import cv2
@@ -34,8 +35,8 @@ GPIO.setup(22, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(27, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-ser = serial.Serial('/dev/ttyACM0')
-ser.flushInput()
+ser = serial.Serial('/dev/ttyACM0', 115200, timeout=0)
+#ser.flushInput()
 
 filename = "data_" + str(time.time()) + ".csv"
 f = open(filename, "a")
@@ -107,6 +108,39 @@ def overlay_transparent(background_img, img_to_overlay_t, x, y, overlay_size=Non
         # Update the original image with our new ROI
         bg_img[y:y+h, x:x+w] = cv2.add(img1_bg, img2_fg)
         return bg_img
+def handle_data(data):
+    print(data)
+
+def read_from_port():
+    while True:
+        if(ser.inWaiting()>0):
+            ser_bytes = ser.read(ser.inWaiting()).decode('ascii')
+            #ser_bytes = ser.readline()
+            message = str(ser_bytes)
+            #message = message.replace("b", "")
+            #message = message.replace("r", "")
+            #message = message.replace("n'", "")
+            #message = message.replace("\\", "")
+            #message = message.replace("\'", "")
+            sensors = message.split(",")
+            global temperature
+            temperature = sensors[len(sensors)-2]
+            global heart
+            heart = sensors[len(sensors)-1]
+            global pitch
+            pitch = sensors[len(sensors)-5]
+            global roll
+            roll = sensors[len(sensors)-4]
+            global yaw
+            yaw = sensors[len(sensors)-3]
+            handle_data(heart)
+        time.sleep(0.01)
+        #print("test")
+        #reading = ser.readline().decode()
+        #handle_data(reading)
+
+thread = threading.Thread(target=read_from_port)
+thread.start()
 
 tag_date = ""
 basicfont = pygame.font.SysFont(None, 48)
@@ -117,25 +151,40 @@ main = True
 recording = False
 ser.readline()
 time.sleep(1)
-temperature = 0
+#temperature = 0
 # Video processing
 while(True):
+    #ser_bytes = ser.readline()
+    #message = str(ser_bytes)
+    #message = message.replace("b", "")
+    #message = message.replace("r", "")
+    #message = message.replace("n'", "")
+    #message = message.replace("\\", "")
+    #message = message.replace("\'", "")
+    #sensors = message.split(",")
+    #temperature = sensors[len(sensors)-1]
+    #heart = sensors[len(sensors)-2]
+    #pitch = sensors[len(sensors)-3]
+    #roll = sensors[len(sensors)-4]
+    #yaw = sensors[len(sensors)-5]
+    
     if main == True:
         now = datetime.now()
         # Read in Serial line
-        ser_bytes = ser.readline()
-        message = str(ser_bytes)
-        message = message.replace("b", "")
-        message = message.replace("r", "")
-        message = message.replace("n'", "")
-        message = message.replace("\\", "")
-        message = message.replace("\'", "")
-        sensors = message.split(",")
-        temperature = sensors[len(sensors)-1]
-        heart = sensors[len(sensors)-2]
-        pitch = sensors[len(sensors)-3]
-        roll = sensors[len(sensors)-4]
-        yaw = sensors[len(sensors)-5]
+        #ser_bytes = ser.readline()
+        #message = str(ser_bytes)
+        #message = message.replace("b", "")
+        #message = message.replace("r", "")
+        #message = message.replace("n'", "")
+        #message = message.replace("\\", "")
+        #message = message.replace("\'", "")
+        #sensors = message.split(",")
+        #temperature = sensors[len(sensors)-1]
+        #heart = sensors[len(sensors)-2]
+        #pitch = sensors[len(sensors)-3]
+        #roll = sensors[len(sensors)-4]
+        #yaw = sensors[len(sensors)-5]
+        #print("Pitch: " + str(pitch) + ", Roll: " + str(roll) + ", Yaw: " + str(yaw))
         bigFont = pygame.font.SysFont(None, 48)
         medFont = pygame.font.SysFont(None, 32)
         smallFont = pygame.font.SysFont(None, 24)
@@ -173,7 +222,20 @@ while(True):
         ret, frame = cap.read()
         frame1 = frame.copy()
         screen.fill([0,0,0])
-        
+        #ser_bytes = ser.readline()
+        #message = str(ser_bytes)
+        #message = message.replace("b", "")
+        #message = message.replace("r", "")
+        #message = message.replace("n'", "")
+        #message = message.replace("\\", "")
+        #message = message.replace("\'", "")
+        #sensors = message.split(",")
+        #temperature = sensors[len(sensors)-1]
+        #heart = sensors[len(sensors)-2]
+        #pitch = sensors[len(sensors)-3]
+        #roll = sensors[len(sensors)-4]
+        #yaw = sensors[len(sensors)-5]
+        #print(str(pitch) + ", " + str(roll) + ", " + str(yaw))
         # Create overlay of frame add transparent image at screen coordinates (10, 80)
         #overlay = overlay_transparent(frame, overlay_t, 10, 80, (50,50))
         #ov = overlay_transparent(frame1, overlay_t, 5, 80, (50,50))
