@@ -101,6 +101,7 @@ def button(number):
 
     if number == 1:
         # desktop
+        print("Button 1 Pressed!")
         screen.fill(black)
         font=pygame.font.Font(None,72)
         label=font.render("Launching Desktop", 1, (white))
@@ -113,6 +114,7 @@ def button(number):
 
     if number == 2:
         # exit
+        print("Button 2 Pressed!")
         screen.fill(black)
         font=pygame.font.Font(None,72)
         label=font.render("Exiting to Terminal", 1, (white))
@@ -123,6 +125,7 @@ def button(number):
 
     if number == 3:
         # Pretend Shutdown
+        print("Button 3 Pressed!")
         screen.fill(black)
         font=pygame.font.Font(None,48)
         label=font.render("Battery Low, Shutting down", 1, (white))
@@ -132,38 +135,32 @@ def button(number):
         pygame.quit()
         sys.exit()
 
-    if number == 4:
+    #if number == 4:
         # Wifi Settings
-        screen.fill(black)
-        font=pygame.font.Font(None,72)
-        label=font.render("WiFi Settings. .", 1, (white))
-        screen.blit(label,(20,120))
-        pygame.display.flip()
-        pygame.quit()
-        os.system("sudo python /home/pi/pifi.py/pifi.py --gui")
-        sys.exit()
+        #screen.fill(black)
+        #font=pygame.font.Font(None,72)
+        #label=font.render("WiFi Settings. .", 1, (white))
+        #screen.blit(label,(20,120))
+        #pygame.display.flip()
+        #pygame.quit()
+        #os.system("sudo python /home/pi/pifi.py/pifi.py --gui")
+        #sys.exit()
 
-    if number == 5:
-        # reboot
-        screen.fill(black)
-        font=pygame.font.Font(None,72)
-        label=font.render("Rebooting. .", 1, (white))
-        screen.blit(label,(40,120))
-        pygame.display.flip()
+    if number == 4:
+        print("Button 4 Pressed!")
         pygame.quit()
-        restart()
+        page=os.environ["MENUDIR"] + "cam_only.py"
+        os.execvp("python", ["python", page])
         sys.exit()
-
-    if number == 6:
         # shutdown
-        screen.fill(black)
-        font=pygame.font.Font(None,72)
-        label=font.render("Shutting Down. .", 1, (white))
-        screen.blit(label,(20,120))
-        pygame.display.flip()
-        pygame.quit()
-        shutdown()
-        sys.exit()
+        #screen.fill(black)
+        #font=pygame.font.Font(None,72)
+        #label=font.render("Shutting Down. .", 1, (white))
+        #screen.blit(label,(20,120))
+        #pygame.display.flip()
+        #pygame.quit()
+        #shutdown()
+        #sys.exit()
 
 
 
@@ -214,6 +211,7 @@ while 1:
     for event in pygame.event.get():
         if event.type == pygame.MOUSEBUTTONDOWN:
             pos = (pygame.mouse.get_pos() [0], pygame.mouse.get_pos() [1])
+            print(pos)
             on_touch()
 
         #ensure there is always a safe way to end the program if the touch screen fails

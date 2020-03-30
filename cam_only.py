@@ -200,6 +200,9 @@ while(True):
         if recording == True:
             out.write(frame)
 
+        if showSensors == True:
+            out.write(frame)
+
         # Combine overlay to frame, apply transparency
         #cv2.addWeighted(overlay, opacity, frame, 1 - opacity, 0, frame)
         #cv2.addWeighted(ov, opacity, frame1, 1 - opacity, 0, frame1)
@@ -233,6 +236,8 @@ while(True):
             elif showSensors == False:
                 showSensors = not showSensors
                 show2 = 2
+                # Create video
+                out = cv2.VideoWriter(save_path, video_type_cv2,frames_per_seconds,  my_res)
                 time.sleep(0.5)
                 
         if GPIO.input(23) == False and main == False:
@@ -246,6 +251,6 @@ while(True):
             main = True
 
 	# Break loop
-    if cv2.waitKey(20) & 0xFF == ord('q'):
+    if cv2.waitKey(50) & 0xFF == ord('q'):
         break
 
