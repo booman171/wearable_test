@@ -1,7 +1,7 @@
 import threading
 import time
 import serial
-from pulsesensor import Pulsesensor
+
 
 class Sensorserial:
    def __init__(self):
@@ -53,18 +53,6 @@ class Sensorserial:
 
 s = Sensorserial()
 s.startSerialRead()
-p = Pulsesensor()
-p.startAsyncBPM()
 
-try:
-   while True:
-      p.ecg_signal = s.getECG()
-      #print(p.ecg_signal)
-      bpm = p.BPM
-      if bpm > 0:
-         print("BPM: %d" % bpm)
-      else:
-         print("No Heartbeat found")
-      time.sleep(0.1)
-except:
-   s.stopSerialRead()
+while True:
+   print(s.getECG())
