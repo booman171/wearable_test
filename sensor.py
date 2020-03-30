@@ -55,11 +55,67 @@ class Sensor:
                sensors = message.split(",")
                self.temperature = sensors[len(sensors)-2]
                self.ecg = sensors[len(sensors)-1]
-               selfpitch = sensors[len(sensors)-5]
+               self.pitch = sensors[len(sensors)-5]
                self.roll = sensors[len(sensors)-4]
                self.yaw = sensors[len(sensors)-3]
+               self.processECG(self.ecg)
             time.sleep(0.01)
             
+    def processECG(signal):
+        currentTime = int(time.time()*1000)
+        print(signal)
+        sampleCounter += currentTime - lastTime
+        lastTime = currentTime
+        N = sampleCounter - lastBeatTime
+
+        # find the peak and trough of the pulse wave
+        if signal < thresh and N > (IBI/5.0)*3:     # avoid dichrotic noise by waiting 3/5 of last IBI
+            if self.ecg < T:                          # T is the trough
+                T = signal                          # keep track of lowest point in pulse wave 
+
+        if signal > thresh and signal > P:
+            P = signal
+
+        # signal surges up in value every time there is a pulse
+        if N > 250:                                 # avoid high frequency noise
+            if signal > thresh and Pulse == False and N > (IBI/5.0)*3:
+                Pulse = True                        # set the Pulse flag when we think there is a pulse
+                IBI = sampleCounter - lastBeatTime  # measure time between beats in mS
+                lastBeatTime = sampleCounter        # keep track of time for next pulse
+                if secondBeat:                      # if this is the second beat, if secondBeat == TRUE
+                    secondBeat = False;             # clear secondBeat flag
+                    for i in range(len(rate)):      # seed the running total to get a realisitic BPM at startup
+                      rate[i] = IBI
+                if firstBeat:                       # if it's the first time we found a beat, if firstBeat == TRUE
+                    firstBeat = False;              # clear firstBeat flag
+                    secondBeat = True;              # set the second beat flag
+                    continue
+
+                # keep a running total of the last 10 IBI values
+                rate[:-1] = rate[1:]                # shift data in the rate array
+                rate[-1] = IBI                      # add the latest IBI to the rate array
+                runningTotal = sum(rate)            # add upp oldest IBI values
+                runningTotal /= len(rate)           # average the IBI values
+                self.BPM = 60000/runningTotal       # how many beats can fit into a minute? that's BPM!
+
+        if Signal < thresh and Pulse == True:       # when the values are going down, the beat is over
+            Pulse = False                           # reset the Pulse flag so we can do it again
+            amp = P - T                             # get amplitude of the pulse wave
+            thresh = amp/2 + T                      # set thresh at 50% of the amplitude
+            P = thresh                              # reset these for next time
+            T = thresh
+
+        if N > 2500:                                # if 2.5 seconds go by without a beat
+            thresh = 512                            # set thresh default
+            P = 512                                 # set P default
+            T = 512                                 # set T default
+            lastBeatTime = sampleCounter            # bring the lastBeatTime up to date        
+            firstBeat = True                        # set these to avoid noise
+            secondBeat = False                      # when we get the heartbeat back
+            self.BPM = 0
+
+        time.sleep(0.005)
+        
     # Start getBPMLoop routine which saves the BPM in its variable
     def startSensorRead(self):
         self.thread = threading.Thread(target=self.read_from_port)
