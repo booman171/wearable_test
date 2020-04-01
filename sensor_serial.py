@@ -14,8 +14,8 @@ class Sensorserial:
       self.roll = 0
       self.yaw = 0
       self.signal = []
-      self.filename = "data.csv"
-
+      self.filename = "data_ecg.csv"
+      self.cnt = 0
    def read_from_port(self):
       ser =  serial.Serial('/dev/ttyACM0', 115200, timeout=0)
       while True:
@@ -28,6 +28,12 @@ class Sensorserial:
             selfpitch = sensors[len(sensors)-5]
             self.roll = sensors[len(sensors)-4]
             self.yaw = sensors[len(sensors)-3]
+            if self.cnt < 30:
+               #with open(self.filename, 'a') as f:
+               #   f.write(self.ecg + "\n")
+               self.cnt += 1
+            else:
+               self.cnt = 0
          time.sleep(0.01)
    def getECG(self):
       return  float(self.ecg)
@@ -44,15 +50,6 @@ class Sensorserial:
    def getYaw(self):
       return float(self.yaw)
 
-   def processECG(self):
-      self.signal.append(self.ecg)
-      for n in range(30):
-         with open(self.filename, 'w') as csvfile:
-            csvfile.write(str(self.ecg) + ",")
-
-         #data = np.asarray(self.signal, dtype=np.float32)
-         #wd, m = hp.process(data, 100)
-
    def startSerialRead(self):
       self.thread = threading.Thread(target=self.read_from_port)
       self.thread.stopped = False
@@ -65,7 +62,3 @@ class Sensorserial:
 
 s = Sensorserial()
 s.startSerialRead()
-
-while True:
-   print(s.getECG())
-   s.processECG()

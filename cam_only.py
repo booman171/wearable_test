@@ -38,10 +38,10 @@ GPIO.setup(27, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 ser = serial.Serial('/dev/ttyACM0', 115200, timeout=0)
 #ser.flushInput()
 
-filename = "data_" + str(time.time()) + ".csv"
+filename = "data_ecgggggg" + str(time.time()) + ".csv"
 f = open(filename, "a")
-f.write("Epoch,Pitch,Roll,Yaw,Temp,Pulse" + "\n")
-f.close
+#f.write("Epoch,Pitch,Roll,Yaw,Temp,Pulse" + "\n")
+#f.close
 
 # Set time at start of program
 start = time.monotonic()
@@ -104,6 +104,7 @@ def handle_data(data):
     print(data)
 
 def read_from_port():
+    cnt = 0
     while True:
         if(ser.inWaiting()>0):
             ser_bytes = ser.read(ser.inWaiting()).decode('ascii')
@@ -120,6 +121,9 @@ def read_from_port():
             global yaw
             yaw = sensors[len(sensors)-3]
             handle_data(heart)
+            with open(filename, 'a') as f:
+               f.write(heart + "\n")
+               print("writing")
         time.sleep(0.01)
 thread = threading.Thread(target=read_from_port)
 thread.start()
