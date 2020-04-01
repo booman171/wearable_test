@@ -33,20 +33,6 @@ class Sensor:
     def read_from_port(self):
         # init variables
         ser = serial.Serial('/dev/ttyACM0', 115200, timeout=0)
-        rate = [0] * 10         # array to hold last 10 IBI values
-        sampleCounter = 0       # used to determine pulse timing
-        lastBeatTime = 0        # used to find IBI
-        P = 512                 # used to find peak in pulse wave, seeded
-        T = 512                 # used to find trough in pulse wave, seeded
-        thresh = 525            # used to find instant moment of heart beat, seeded
-        amp = 100               # used to hold amplitude of pulse waveform, seeded
-        firstBeat = True        # used to seed rate array so we startup with reasonable BPM
-        secondBeat = False      # used to seed rate array so we startup with reasonable BPM
-
-        IBI = 600               # int that holds the time interval between beats! Must be seeded!
-        Pulse = False           # "True" when User's live heartbeat is detected. "False" when not a "live beat". 
-        lastTime = int(time.time()*1000)
-
         #while not self.thread.stopped:
         while True:
             if(ser.inWaiting()>0):
@@ -58,19 +44,31 @@ class Sensor:
                self.pitch = sensors[len(sensors)-5]
                self.roll = sensors[len(sensors)-4]
                self.yaw = sensors[len(sensors)-3]
-               self.processECG(self.ecg)
+               self.processECG(float(self.ecg))
             time.sleep(0.01)
             
-    def processECG(signal):
+    def processECG(self, signal):
+        rate = [0] * 10         # array to hold last 10 IBI values
+        sampleCounter = 0       # used to determine pulse timing
+        lastBeatTime = 0        # used to find IBI
+        P = 512                 # used to find peak in pulse wave, seeded
+        T = 512                 # used to find trough in pulse wave, seeded
+        thresh = 500            # used to find instant moment of heart beat, seeded
+        amp = 100               # used to hold amplitude of pulse waveform, seeded
+        firstBeat = True        # used to seed rate array so we startup with reasonable BPM
+        secondBeat = False      # used to seed rate array so we startup with reasonable BPM
+        IBI = 600               # int that holds the time interval between beats! Must be seeded!
+        Pulse = False           # "True" when User's live heartbeat is detected. "False" when not a "live beat".
+        lastTime = int(time.time()*1000)
         currentTime = int(time.time()*1000)
-        print(signal)
+        #print(signal)
         sampleCounter += currentTime - lastTime
         lastTime = currentTime
         N = sampleCounter - lastBeatTime
 
         # find the peak and trough of the pulse wave
-        if signal < thresh and N > (IBI/5.0)*3:     # avoid dichrotic noise by waiting 3/5 of last IBI
-            if self.ecg < T:                          # T is the trough
+        if signal < thresh:     # avoid dichrotic noise by waiting 3/5 of last IBI   and N > (IBI/5.0)*3
+            if signal < T:                          # T is the trough
                 T = signal                          # keep track of lowest point in pulse wave 
 
         if signal > thresh and signal > P:
@@ -78,18 +76,21 @@ class Sensor:
 
         # signal surges up in value every time there is a pulse
         if N > 250:                                 # avoid high frequency noise
+            print("N > 250")
             if signal > thresh and Pulse == False and N > (IBI/5.0)*3:
+                print(" signal > thresh and Pulse == False and N > (IBI/5.0)*3")
                 Pulse = True                        # set the Pulse flag when we think there is a pulse
                 IBI = sampleCounter - lastBeatTime  # measure time between beats in mS
                 lastBeatTime = sampleCounter        # keep track of time for next pulse
                 if secondBeat:                      # if this is the second beat, if secondBeat == TRUE
+                    print("secondBeat")
                     secondBeat = False;             # clear secondBeat flag
                     for i in range(len(rate)):      # seed the running total to get a realisitic BPM at startup
                       rate[i] = IBI
                 if firstBeat:                       # if it's the first time we found a beat, if firstBeat == TRUE
+                    print("firstBeat")
                     firstBeat = False;              # clear firstBeat flag
                     secondBeat = True;              # set the second beat flag
-                    continue
 
                 # keep a running total of the last 10 IBI values
                 rate[:-1] = rate[1:]                # shift data in the rate array
@@ -98,7 +99,8 @@ class Sensor:
                 runningTotal /= len(rate)           # average the IBI values
                 self.BPM = 60000/runningTotal       # how many beats can fit into a minute? that's BPM!
 
-        if Signal < thresh and Pulse == True:       # when the values are going down, the beat is over
+        if signal < thresh and Pulse == True:       # when the values are going down, the beat is over
+            print("signal < thresh and Pulse == True: ")
             Pulse = False                           # reset the Pulse flag so we can do it again
             amp = P - T                             # get amplitude of the pulse wave
             thresh = amp/2 + T                      # set thresh at 50% of the amplitude
@@ -106,6 +108,7 @@ class Sensor:
             T = thresh
 
         if N > 2500:                                # if 2.5 seconds go by without a beat
+            print("N > 2500:")
             thresh = 512                            # set thresh default
             P = 512                                 # set P default
             T = 512                                 # set T default
@@ -114,7 +117,7 @@ class Sensor:
             secondBeat = False                      # when we get the heartbeat back
             self.BPM = 0
 
-        time.sleep(0.005)
+        #time.sleep(0.005)
         
     # Start getBPMLoop routine which saves the BPM in its variable
     def startSensorRead(self):
@@ -135,7 +138,7 @@ s.startSensorRead()
 
 try:
    while True:
-      signal = s.getECG()
+      signal = s.getBPM()
       print(signal)
       bpm = s.BPM
       if bpm > 0:

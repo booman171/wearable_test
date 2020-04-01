@@ -1,7 +1,10 @@
 import threading
 import time
 import serial
-
+import heartpy as hp
+import matplotlib.pyplot as plt
+import numpy as np
+import csv
 
 class Sensorserial:
    def __init__(self):
@@ -10,6 +13,8 @@ class Sensorserial:
       self.pitch = 0
       self.roll = 0
       self.yaw = 0
+      self.signal = []
+      self.filename = "data.csv"
 
    def read_from_port(self):
       ser =  serial.Serial('/dev/ttyACM0', 115200, timeout=0)
@@ -39,6 +44,15 @@ class Sensorserial:
    def getYaw(self):
       return float(self.yaw)
 
+   def processECG(self):
+      self.signal.append(self.ecg)
+      for n in range(30):
+         with open(self.filename, 'w') as csvfile:
+            csvfile.write(str(self.ecg) + ",")
+
+         #data = np.asarray(self.signal, dtype=np.float32)
+         #wd, m = hp.process(data, 100)
+
    def startSerialRead(self):
       self.thread = threading.Thread(target=self.read_from_port)
       self.thread.stopped = False
@@ -49,10 +63,9 @@ class Sensorserial:
       self.thread.stopped = True
       return
 
-
-
 s = Sensorserial()
 s.startSerialRead()
 
 while True:
    print(s.getECG())
+   s.processECG()
