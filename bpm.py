@@ -1,36 +1,48 @@
 import time
 
-max_buffer = 100
-prevData = [None] * MAX_BUFFER
-sumData=0
-maxData=0
-avgData=0
-roundrobin=0
-countData=0
-period=0
-lastperiod=0
-millistimer=time.time()
-frequency=0
-beatspermin=0
-newData = 0
+class BPM:
+    def __init__(self, ecg=None):
+    #self.ecg = ecg
+    self.max_buffer = 100
+    self.prevData = [None] * MAX_BUFFER
+    self.sumData=0
+    self.maxData=0
+    self.avgData=0
+    self.roundrobin=0
+    self.countData=0
+    self.period=0
+    self.lastperiod=0
+    self.millistimer=time.time()
+    self.frequency=0
+    self.beatspermin=0
+    self.newData = ecg
+    def freqDetec(){
+        if(self.countData == self.MAX_BUFFER):
+            if(self.prevData{self.roundrobin] < self.avgData*1.5 and self.newData >= self.avgData*1.5:
+                self.period = time.time()-self.millistimer
+                self.millistimer = time.time()
+                self.maxData = 0
+        self.roundrobin++
+        if(self.roundrobin >= self.MAX_BUFFER):
+            self.roundrobin=0
+        if(self.countData<self.MAX_BUFFER):
+            self.countData++
+            self.sumData+=self.newData
+        else:
+            self.sumData+=self.newData-self.prevData[self.roundrobin];
+        self.avgData = self.sumData/self.countData;
+        if(self.newData>self.maxData):
+            self.maxData = self.newData
+        self.prevData[self.roundrobin] = self.newData; #store previous value
 
-def freqDetec(){
-   if(countData == MAX_BUFFER):
-      if(prevData{roundrobin] < avgData*1.5 and newData >= avgData*1.5:
-         period = time.time()-millistimer
-         millistimer = time.time()
-         maxData = 0
-   roundrobin++
-   if(roundrobin >= MAX_BUFFER):
-      roundrobin=0
-   if(countData<MAX_BUFFER):
-      countData++
-      sumData+=newData
-   else:
-      sumData+=newData-prevData[roundrobin];
-   avgData = sumData/countData;
-   if(newData>maxData):
-      maxData = newData
-   prevData[roundrobin] = newData; #store previous value
+    def calcBPM():
+        #newData = analogRead(34);
+        self.freqDetec();
+        if (self.period!=self.lastperiod):
+            self.frequency = 1000/float(self.period);//timer rate/period
+            if (self.frequency*60 > 20 && self.frequency*60 < 200): # supress unrealistic Data
+                self.beatspermin=self.frequency*60;
+                self.lastperiod=self.period;
+        time.sleep(5)
 
-
+}
