@@ -1,4 +1,3 @@
-
 from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
@@ -18,6 +17,7 @@ from pygame.locals import *
 import sys
 import RPi.GPIO as GPIO
 import serial
+#import heartpy as hp
 
 pygame.init()
 pygame.mouse.set_visible(False)
@@ -38,9 +38,9 @@ GPIO.setup(27, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 ser = serial.Serial('/dev/ttyACM0', 115200, timeout=0)
 #ser.flushInput()
 
-filename = "data_ecgggggg" + str(time.time()) + ".csv"
-f = open(filename, "a")
-#f.write("Epoch,Pitch,Roll,Yaw,Temp,Pulse" + "\n")
+filename1 = "data_ecgggggg" + str(time.time()) + ".csv"
+f = open("serial_data.csv", "a")
+f.write("Epoch,Pitch,Roll,Yaw,Temp,Pulse" + "\n")
 #f.close
 
 # Set time at start of program
@@ -120,11 +120,10 @@ def read_from_port():
             roll = sensors[len(sensors)-4]
             global yaw
             yaw = sensors[len(sensors)-3]
-            handle_data(heart)
-            with open(filename, 'a') as f:
-               f.write(heart + "\n")
-               print("writing")
-        time.sleep(0.01)
+            with open("serial_data.csv", 'a') as n:
+               n.write(str(time.time()) + "," + pitch + "," + roll + "," + yaw + "," + temperature + "," + heart)
+        time.sleep(0.001)
+
 thread = threading.Thread(target=read_from_port)
 thread.start()
 
