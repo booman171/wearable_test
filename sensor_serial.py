@@ -1,8 +1,9 @@
 import threading
 import time
 import serial
-import heartpy as hp
+#import heartpy as hp
 import matplotlib.pyplot as plt
+from bpm import BPM
 import numpy as np
 import csv
 
@@ -62,3 +63,9 @@ class Sensorserial:
 
 s = Sensorserial()
 s.startSerialRead()
+
+b = BPM()
+
+while True:
+   b.calcBPM(s.getECG())
+   print(b.getBPM())
