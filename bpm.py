@@ -2,19 +2,19 @@ import time
 
 class BPM:
     def __init__(self):
-    #self.ecg = ecg
-    self.max_buffer = 100
-    self.prevData = [None] * MAX_BUFFER
-    self.sumData=0
-    self.maxData=0
-    self.avgData=0
-    self.roundrobin=0
-    self.countData=0
-    self.period=0
-    self.lastperiod=0
-    self.millistimer=time.time()
-    self.frequency=0
-    self.beatspermin=0
+        #self.ecg = ecg
+        self.max_buffer = 100
+        self.prevData = [None] * MAX_BUFFER
+        self.sumData=0
+        self.maxData=0
+        self.avgData=0
+        self.roundrobin=0
+        self.countData=0
+        self.period=0
+        self.lastperiod=0
+        self.millistimer=time.time()
+        self.frequency=0
+        self.beatspermin=0
     def getBPM(self):
         return self.beatspermin
 
