@@ -1,37 +1,64 @@
 from __future__ import division
+
 from __future__ import print_function
 from __future__ import absolute_import
 
+import threading
 import os
 import numpy as np
 import cv2
 import time
 import picamera
 import datetime as dt
-import board
-import busio
-import adafruit_sgp30
-import adafruit_lsm9ds1
 import csv
 from datetime import datetime
 import math
-# import imutils
+import pygame
+from pygame.locals import *
+import sys
+import RPi.GPIO as GPIO
+import serial
+import board
+import busio
+import adafruit_lsm9ds1
+import adafruit_mcp9808
+from overlay import overlay_transparent
+from firebase import firebase
+#from metawear import MWBoard
 
-# Create accel.csv file to write sensor data to
-f = open("accel.csv", "w", newline="")
-c=csv.writer(f)
+pygame.init()
+pygame.mouse.set_visible(False)
+pygame.display.set_caption("OpenCV camera stream on Pygame")
+screen = pygame.display.set_mode([320,240])
+
+font = pygame.font.SysFont("comicsansms", 72)
+text = font.render("Hello, World", True, (0, 128, 0))
+
+os.putenv('SDL_FBDEV', '/dev/fb1')
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(17, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(22, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(27, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+ser = serial.Serial('/dev/ttyACM0', 115200, timeout=0)
+#ser.flushInput()
+
+filename1 = "data_ecgggggg" + str(time.time()) + ".csv"
+f = open("serial_data.csv", "a")
+f.write("Epoch,ECG,BPM" + "\n")
+#f.close
 
 # Set time at start of program
 start = time.monotonic()
 timestr = time.strftime("%Y%m%d-%H%M%S")
-
 # Set declination based on location http://www.magnetic-declination.com/
 declination = -0.106988683
-
 # Set filename video.avi for recording camera output
 filename = 'video' + timestr + '.avi' # .avi .mp4
 # Set picamera standard frame rate
-frames_per_seconds = 10.0
+frames_per_seconds = 30.0
 # Set recording resolution
 my_res = (640, 480) #'480p' # 1080p
 # Read from default (0) camera
@@ -40,158 +67,207 @@ cap = cv2.VideoCapture(0)
 video_type_cv2 = cv2.VideoWriter_fourcc(*'XVID')
 # Save video.avi to current directory
 save_path = os.path.join(filename)
-# Create video
-out = cv2.VideoWriter(save_path, video_type_cv2,frames_per_seconds,  my_res)
 
-# I2C connection for sensor LSM9DS1 https://www.adafruit.com/product/3387
-i2c = busio.I2C(board.SCL, board.SDA, frequency=100000)
-sensor = adafruit_lsm9ds1.LSM9DS1_I2C(i2c)
+# I2C connection:
+#i2c = busio.I2C(board.SCL, board.SDA)
+#imu = adafruit_lsm9ds1.LSM9DS1_I2C(i2c)
+#mcp = adafruit_mcp9808.MCP9808(i2c)
 
-# Setup for gas sensor https://www.adafruit.com/product/3709
-sgp30 = adafruit_sgp30.Adafruit_SGP30(i2c)
-print("SGP30 serial #", [hex(i) for i in sgp30.serial])
-sgp30.iaq_init()
-sgp30.set_iaq_baseline(0x8973, 0x8aae)
+#accel_x = 0
+#accel_y = 0
+#accel_z = 0
+#mag_x = 0
+#mag_y = 0
+#mag_z = 0
+#gyro_x = 0
+#gyro_y = 0
+#gyro_z = 0
+#imu_temp = 0
+#tempC = 0
+#tempF = 0
 
-# Define text-to-speak  function
-def speak(text):
-	os.system("espeak ' " + text + " ' ")
+# Read in transport image of thermostat icon
+overlay_t = cv2.imread('therm.png', -1)
+thermometer = pygame.image.load('therm.png')
+thermometer = pygame.transform.rotozoom(thermometer, 0, 0.08)
+
+firebase = firebase.FirebaseApplication('https://wear1-38901.firebaseio.com/')
 
 # Define method for overlaying trasnparent images
-# copied from https://gist.github.com/clungzta/b4bbb3e2aa0490b0cfcbc042184b0b4e
-def overlay_transparent(background_img, img_to_overlay_t, x, y, overlay_size=None):
-	"""
-	@brief      Overlays a transparant PNG onto another image using CV2
-	
-	@param      background_img    The background image
-	@param      img_to_overlay_t  The transparent image to overlay (has alpha channel)
-	@param      x                 x location to place the top-left corner of our overlay
-	@param      y                 y location to place the top-left corner of our overlay
-	@param      overlay_size      The size to scale our overlay to (tuple), no scaling if None
-	
-	@return     Background image with overlay on top
-	"""
-	bg_img = background_img.copy()
-	if overlay_size is not None:
-		img_to_overlay_t = cv2.resize(img_to_overlay_t.copy(), overlay_size)
+def handle_data(data):
+    print(data)
 
-	# Extract the alpha mask of the RGBA image, convert to RGB 
-	b,g,r,a = cv2.split(img_to_overlay_t)
-	overlay_color = cv2.merge((b,g,r))
-	# Apply some simple filtering to remove edge noise
-	mask = cv2.medianBlur(a,5)
-	h, w, _ = overlay_color.shape
-	roi = bg_img[y:y+h, x:x+w]
-	# Black-out the area behind the logo in our original ROI
-	img1_bg = cv2.bitwise_and(roi.copy(),roi.copy(),mask = cv2.bitwise_not(mask))
-	# Mask out the logo from the logo image.
-	img2_fg = cv2.bitwise_and(overlay_color,overlay_color,mask = mask)
-	# Update the original image with our new ROI
-	bg_img[y:y+h, x:x+w] = cv2.add(img1_bg, img2_fg)
+def read_from_port():
+    cnt = 0
+    while True:
+        if(ser.inWaiting()>0):
+            ser_bytes = ser.read(ser.inWaiting()).decode('ascii')
+            message = str(ser_bytes)
+            message = message.replace("\r","")
+            message = message.replace("\n","")
+            sensors = message.split(",")
+            if(len(sensors) == 4):
+               global tempC
+               print(sensors)
+               tempC = sensors[len(sensors)-1]
+               global tempF
+               tempF = sensors[len(sensors)-2]
+               global bpm
+               bpm = sensors[len(sensors)-3]
+               global ecg
+               ecg = sensors[len(sensors)-4]
 
-	return bg_img
+               #store the Host ID(provided in firebase database) in variable where you want to send the real time sensor data.
+               #firebase = firebase.FirebaseApplication('https://wear1-38901.firebaseio.com/')
 
-# Var for radius of compass
-length = 50;
-# (x,y) position for start of compass arrow
-p1x = 590
-p1y = 110
-# Read in transparent image of thermostat icon
-overlay_t = cv2.imread('therm.png',-1)
+               #store the readings in variable and convert it into string and using firbase.post then data will be posted to databse of firebase
+               result = firebase.post('wear1', {'ECG':str(ecg),'BPM':str(bpm), 'Temp F':str(tempF)})
 
-max = 2400
-min = 400
-breath = 0
-warmup = 0
+               with open("serial_data.csv", 'a') as n:
+                  n.write(str(time.time()) + "," + ecg + "," + bpm)
+        time.sleep(0.001)
+
+thread = threading.Thread(target=read_from_port)
+thread.start()
+
+
+tag_date = ""
+basicfont = pygame.font.SysFont(None, 48)
+
+show = 400
+show2 = 400
+cam = False
+main = True
+recording = False
+showSensors = False
+ser.readline()
+
+#mwboard = MWBoard()
+
+time.sleep(1)
 # Video processing
 while(True):
-    # set each frame from camera as 'frame'
-    ret, frame = cap.read()
-    # Create overlay of frame add transparent image at screen coordinates (10, 80)
-    overlay = overlay_transparent(frame, overlay_t, 10, 80, (50,50))
+    #accel_x, accel_y, accel_z = imu.acceleration
+    #mag_x, mag_y, mag_z = imu.magnetic
+    #gyro_x, gyro_y, gyro_z = imu.gyro
+    #imu_temp = imu.temperature
+    #tempC = mcp.temperature
+    #tempF = tempC * 9 / 5 + 32
+    #mwboard.stream()
+    if main == True:
+        now = datetime.now()
+        bigFont = pygame.font.SysFont(None, 48)
+        medFont = pygame.font.SysFont(None, 32)
+        smallFont = pygame.font.SysFont(None, 24)
+        clock = bigFont.render(now.strftime("%H:%M:%S"), True, (0, 0, 0))
+        exit_button = medFont.render("Exit", True, (0, 255, 0))
+        cam_button = medFont.render("Cam", True, (0, 255, 0))
+        temp = medFont.render(str(tempF) + " C", True, (255, 0, 0))
+        showBPM = medFont.render("BPM: " + bpm, True, (255, 0, 0))
+        #p = medFont.render("Pitch: " + pitch, True, (0, 0, 255))
+        #r = medFont.render("Roll: " + roll, True, (0, 0, 255))
+        #y = medFont.render("Yaw: " + yaw, True, (0, 0, 255))
+        screen.fill((255, 149, 0))
+        screen.blit(clock, (5, 5))
+        screen.blit(exit_button, (270,210))
+        screen.blit(cam_button, (270,160))
+        screen.blit(temp, (30, 190))
+        screen.blit(thermometer, (1,180))
+        screen.blit(showBPM, (10,60))
+        #screen.blit(p, (10,100))
+        #screen.blit(r, (10,120))
+        #screen.blit(y, (10,140))
+        pygame.display.update()
+        
+        if GPIO.input(23) == False:
+            main = False
+            cam = True
+        
+        # Break loop
+        if GPIO.input(27) == False:
+            pygame.quit()
+            break
     
-    #warmup += 1
-    # Read acceleration, magnetometer, gyroscope,
-    # and temperature from the LSM9DS1 Sensor
-    accel_x, accel_y, accel_z = sensor.acceleration
-    mag_x, mag_y, mag_z = sensor.magnetic
-    gyro_x, gyro_y, gyro_z = sensor.gyro
-    temp = sensor.temperature
-    # Read eCO2 rom SGP30 Sensor
-    eco2 = sgp30.eCO2
-    # Set var now to current date/time
-    now = datetime.now()
-    # Write time and sensor data to csv by column
-    c.writerow([time.monotonic(), eco2, accel_x, accel_y, accel_z, temp])
+    if cam == True:
+        # set each frame from camera as 'frame'
+        ret, frame = cap.read()
+        frame1 = frame.copy()
+        screen.fill([0,0,0])
+        # Create overlay of frame add transparent image at screen coordinates (10, 80)
+        #overlay = overlay_transparent(frame, overlay_t, 10, 80, (50,50))
+        #ov = overlay_transparent(frame1, overlay_t, 5, 80, (50,50))
+        
+        # Set var now to current date/time
+        now = datetime.now()
+        
+        # Set opacity for overlay transparency, the closer to 0 the more transparent
+        opacity = 0.8
+
+        # Overlay date text
+        #cv2.putText(overlay,now.strftime("%H:%M:%S"),(30,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(1, 1, 0),2,cv2.LINE_AA)
+        cv2.putText(frame1,now.strftime("%H:%M:%S"),(20,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),2,cv2.LINE_AA)
+        cv2.putText(frame1,"Rec",(275,55),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        cv2.putText(frame1,str(tempF),(show2,200),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        cv2.putText(frame1,bpm,(show2,230),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        cv2.putText(frame1,"Rec-Bio",(215,120),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        cv2.putText(frame1,"Snap",(255,175),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        cv2.putText(frame1,"Menu",(255,230),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        cv2.putText(frame1,"Recording",(show,20),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,255),1,cv2.LINE_AA)
+        
+        if recording == True:
+            out.write(frame)
+
+        if showSensors == True:
+            out.write(frame)
+
+        # Combine overlay to frame, apply transparency
+        #cv2.addWeighted(overlay, opacity, frame, 1 - opacity, 0, frame)
+        #cv2.addWeighted(ov, opacity, frame1, 1 - opacity, 0, frame1)
+        #out.write(frame)
+
+        frame1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB)
+        frame1 =  np.rot90(frame1)
+        frame1 = cv2.flip(frame1, 0)
+        frame1 = pygame.surfarray.make_surface(frame1)
+        screen.blit(frame1, (0,0))
+        pygame.display.update()
+        #print(str(show))
+        
+        if GPIO.input(17) == False:
+            if recording == True:
+                recording = not recording
+                show = 500
+                time.sleep(0.5)
+            elif recording == False:
+                recording = not recording
+                show = 245
+                # Create video
+                out = cv2.VideoWriter(save_path, video_type_cv2,frames_per_seconds,  my_res)
+                time.sleep(0.5)
+        
+        if GPIO.input(22) == False:
+            if showSensors == True:
+                showSensors = not showSensors
+                show2 = 500
+                time.sleep(0.5)
+            elif showSensors == False:
+                showSensors = not showSensors
+                show2 = 2
+                # Create video
+                out = cv2.VideoWriter(save_path, video_type_cv2,frames_per_seconds,  my_res)
+                time.sleep(0.5)
+                
+        if GPIO.input(23) == False and main == False:
+            filename = "image_" + now.strftime("%H:%M:%S") + ".jpg"
+            save_path = os.path.join(filename)
+            cv2.imwrite(save_path, frame)
     
-    # Calculate heading from magnetometer data
-    # Code adapted from https://www.electronicwings.com/avr-atmega/magnetometer-hmc5883l-interfacing-with-atmega16
-    heading = math.atan2(float(mag_y),float(mag_z)) + declination
-    if heading > 2*math.pi:
-        heading = heading - 2*math.pi
-    if heading < 0:
-        heading = heading + 2*math.pi
-    angle = (heading* 180 / math.pi)
-    theta = angle - 90
-    
-    # Calculate commpass head position (x, y) corresponding to heading angle
-    p2x =  int(p1x + length * math.cos(theta * math.pi / 180.0));
-    p2y =  int(p1y + length * math.sin(theta * math.pi / 180.0));
-    #print("x: ", p2x)
-    #print("y: ", p2y)
-    
-    # Normalization equation: (x - min)/(max - min)
-    # This will convert a data range [min,max] to the range [0,1]
-    # To correpond the normalized eCO2 to the screen I need to
-    # invert the normalized range by subtracting theefunction from 1:
-    # 1-(x - min)/(max-min) or (max - x)/(max - min)
-    gas = (max - eco2) / (max - min)
-    breath = int(gas*100 + 250)
-    # Gas sensor warmup complete around warmup = 120
-    print("gas: %2f" % (eco2))
-    #print("breath = %2f" % (breath))
-    # Overlay 'Breath: '
-    cv2.putText(overlay,"Exhale: ",(25,370),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),1,cv2.LINE_AA)
-    # Overlay eCO2 data
-    cv2.putText(overlay,str(eco2) + "ppm",(25,390),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),1,cv2.LINE_AA)
-    # Breath meter
-    cv2.rectangle(overlay, (30, breath), (35,350), (255, 0, 0), 5)
-#     # Overlay circle as center of compass
-#     cv2.circle(overlay, (590, 110), 15, (0, 255, 255), -1)
-#     # Overlay compass arrow, start point at center of compass, point at heading (px2, pxy)
-#     cv2.arrowedLine(overlay, (590,110), (p2x, p2y), (0, 255, 0), 2)
-#     # Overlay the four Cardinal directions for the compass
-#     cv2.putText(overlay, "N",(585,72),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),1,cv2.LINE_AA)
-#     cv2.putText(overlay, "E",(630,115),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),1,cv2.LINE_AA)
-#     cv2.putText(overlay, "S",(585,158),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),1,cv2.LINE_AA)
-#     cv2.putText(overlay, "W",(542,115),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),1,cv2.LINE_AA)
+        if GPIO.input(27) == False:
+            cam = False
+            time.sleep(0.5)
+            main = True
 
-    # Set opacity for overlay transparency, the closer to 0 the more transparent
-    opacity = 0.8
-     
-    # Overlay date text
-    cv2.putText(overlay,now.strftime("%H:%M:%S"),(30,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(51, 51, 0),2,cv2.LINE_AA)
-    # Overlay 'Heading' heading
-    cv2.putText(overlay,"Heading: " + str(round(angle, 1)),(500,50),cv2.FONT_HERSHEY_SIMPLEX,0.5,(51, 51, 0),2,cv2.LINE_AA)
-    # Overlay 'Temp(C):' heading
-    cv2.putText(overlay,"Temp(C): ",(50,95),cv2.FONT_HERSHEY_SIMPLEX,0.3,(51, 51, 0),1,cv2.LINE_AA)
-    # Overlay temp data
-    cv2.putText(overlay,str(temp),(50,120),cv2.FONT_HERSHEY_SIMPLEX,0.8,(51, 51, 0),2,cv2.LINE_AA)
-# 
-    # Combine overlay to frame, apply transparency
-    cv2.addWeighted(overlay, opacity, frame, 1 - opacity, 0, frame)
-
-    # Write frame to video
-    out.write(frame)
-
-    # Display the resulting frame
-    # Comment out if using ssh to run script
-#     cv2.imshow('frame',frame)
-
-    # Break loop
-    if cv2.waitKey(20) & 0xFF == ord('q'):
+	# Break loop
+    if cv2.waitKey(50) & 0xFF == ord('q'):
         break
-
-	# Close csv file   
-f.close()
 
