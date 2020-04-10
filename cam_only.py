@@ -1,4 +1,5 @@
 from __future__ import division
+
 from __future__ import print_function
 from __future__ import absolute_import
 
@@ -17,7 +18,13 @@ from pygame.locals import *
 import sys
 import RPi.GPIO as GPIO
 import serial
-#import heartpy as hp
+import board
+import busio
+import adafruit_lsm9ds1
+import adafruit_mcp9808
+from overlay import overlay_transparent
+from firebase import firebase
+#from metawear import MWBoard
 
 pygame.init()
 pygame.mouse.set_visible(False)
@@ -40,7 +47,7 @@ ser = serial.Serial('/dev/ttyACM0', 115200, timeout=0)
 
 filename1 = "data_ecgggggg" + str(time.time()) + ".csv"
 f = open("serial_data.csv", "a")
-f.write("Epoch,Pitch,Roll,Yaw,Temp,Pulse" + "\n")
+f.write("Epoch,ECG,BPM" + "\n")
 #f.close
 
 # Set time at start of program
@@ -61,45 +68,32 @@ video_type_cv2 = cv2.VideoWriter_fourcc(*'XVID')
 # Save video.avi to current directory
 save_path = os.path.join(filename)
 
+# I2C connection:
+#i2c = busio.I2C(board.SCL, board.SDA)
+#imu = adafruit_lsm9ds1.LSM9DS1_I2C(i2c)
+#mcp = adafruit_mcp9808.MCP9808(i2c)
+
+#accel_x = 0
+#accel_y = 0
+#accel_z = 0
+#mag_x = 0
+#mag_y = 0
+#mag_z = 0
+#gyro_x = 0
+#gyro_y = 0
+#gyro_z = 0
+#imu_temp = 0
+#tempC = 0
+#tempF = 0
 
 # Read in transport image of thermostat icon
 overlay_t = cv2.imread('therm.png', -1)
 thermometer = pygame.image.load('therm.png')
 thermometer = pygame.transform.rotozoom(thermometer, 0, 0.08)
 
+firebase = firebase.FirebaseApplication('https://wear1-38901.firebaseio.com/')
+
 # Define method for overlaying trasnparent images
-# copied from https://gist.github.com/clungzta/b4bbb3e2aa0490b0cfcbc042184b0b4e
-def overlay_transparent(background_img, img_to_overlay_t, x, y, overlay_size=None):
-        """
-        @brief      Overlays a transparant PNG onto another image using CV2
-        @param      background_img    The background image
-        @param      img_to_overlay_t  The transparent image to overlay (has alpha channel)
-        @param      x                 x location to place the top-left corner of our overlay
-        @param      y                 y location to place the top-left corner of our overlay
-        @param      overlay_size      The size to scale our overlay to (tuple), no scaling if None
-        @return     Background image with overlay on top
-        """
-        bg_img = background_img.copy()
-        if overlay_size is not None:
-                img_to_overlay_t = cv2.resize(img_to_overlay_t.copy(), overlay_size)
-	# Extract the alpha mask of the RGBA image, convert to RGB
-        b,g,r,a = cv2.split(img_to_overlay_t)
-        overlay_color = cv2.merge((b,g,r))
-
-        # Apply some simple filtering to remove edge noise
-        mask = cv2.medianBlur(a,5)
-        h, w, _ = overlay_color.shape
-        roi = bg_img[y:y+h, x:x+w]
-
-        # Black-out the area behind the logo in our original ROI
-        img1_bg = cv2.bitwise_and(roi.copy(),roi.copy(),mask = cv2.bitwise_not(mask))
-
-        # Mask out the logo from the logo image.
-        img2_fg = cv2.bitwise_and(overlay_color,overlay_color,mask = mask)
-
-        # Update the original image with our new ROI
-        bg_img[y:y+h, x:x+w] = cv2.add(img1_bg, img2_fg)
-        return bg_img
 def handle_data(data):
     print(data)
 
@@ -109,23 +103,33 @@ def read_from_port():
         if(ser.inWaiting()>0):
             ser_bytes = ser.read(ser.inWaiting()).decode('ascii')
             message = str(ser_bytes)
+            message = message.replace("\r","")
+            message = message.replace("\n","")
             sensors = message.split(",")
-            global temperature
-            temperature = sensors[len(sensors)-2]
-            global heart
-            heart = sensors[len(sensors)-1]
-            global pitch
-            pitch = sensors[len(sensors)-5]
-            global roll
-            roll = sensors[len(sensors)-4]
-            global yaw
-            yaw = sensors[len(sensors)-3]
-            with open("serial_data.csv", 'a') as n:
-               n.write(str(time.time()) + "," + pitch + "," + roll + "," + yaw + "," + temperature + "," + heart)
+            if(len(sensors) == 4):
+               global tempC
+               print(sensors)
+               tempC = sensors[len(sensors)-1]
+               global tempF
+               tempF = sensors[len(sensors)-2]
+               global bpm
+               bpm = sensors[len(sensors)-3]
+               global ecg
+               ecg = sensors[len(sensors)-4]
+
+               #store the Host ID(provided in firebase database) in variable where you want to send the real time sensor data.
+               #firebase = firebase.FirebaseApplication('https://wear1-38901.firebaseio.com/')
+
+               #store the readings in variable and convert it into string and using firbase.post then data will be posted to databse of firebase
+               result = firebase.post('wear1', {'ECG':str(ecg),'BPM':str(bpm), 'Temp F':str(tempF)})
+
+               with open("serial_data.csv", 'a') as n:
+                  n.write(str(time.time()) + "," + ecg + "," + bpm)
         time.sleep(0.001)
 
 thread = threading.Thread(target=read_from_port)
 thread.start()
+
 
 tag_date = ""
 basicfont = pygame.font.SysFont(None, 48)
@@ -137,9 +141,19 @@ main = True
 recording = False
 showSensors = False
 ser.readline()
+
+#mwboard = MWBoard()
+
 time.sleep(1)
 # Video processing
 while(True):
+    #accel_x, accel_y, accel_z = imu.acceleration
+    #mag_x, mag_y, mag_z = imu.magnetic
+    #gyro_x, gyro_y, gyro_z = imu.gyro
+    #imu_temp = imu.temperature
+    #tempC = mcp.temperature
+    #tempF = tempC * 9 / 5 + 32
+    #mwboard.stream()
     if main == True:
         now = datetime.now()
         bigFont = pygame.font.SysFont(None, 48)
@@ -148,21 +162,21 @@ while(True):
         clock = bigFont.render(now.strftime("%H:%M:%S"), True, (0, 0, 0))
         exit_button = medFont.render("Exit", True, (0, 255, 0))
         cam_button = medFont.render("Cam", True, (0, 255, 0))
-        temp = medFont.render(temperature + " C", True, (255, 0, 0))
-        ecg = medFont.render("ECG: " + heart, True, (255, 0, 0))
-        p = medFont.render("Pitch: " + pitch, True, (0, 0, 255))
-        r = medFont.render("Roll: " + roll, True, (0, 0, 255))
-        y = medFont.render("Yaw: " + yaw, True, (0, 0, 255))
+        temp = medFont.render(str(tempF) + " C", True, (255, 0, 0))
+        showBPM = medFont.render("BPM: " + bpm, True, (255, 0, 0))
+        #p = medFont.render("Pitch: " + pitch, True, (0, 0, 255))
+        #r = medFont.render("Roll: " + roll, True, (0, 0, 255))
+        #y = medFont.render("Yaw: " + yaw, True, (0, 0, 255))
         screen.fill((255, 149, 0))
         screen.blit(clock, (5, 5))
         screen.blit(exit_button, (270,210))
         screen.blit(cam_button, (270,160))
         screen.blit(temp, (30, 190))
         screen.blit(thermometer, (1,180))
-        screen.blit(ecg, (10,60))
-        screen.blit(p, (10,100))
-        screen.blit(r, (10,120))
-        screen.blit(y, (10,140))
+        screen.blit(showBPM, (10,60))
+        #screen.blit(p, (10,100))
+        #screen.blit(r, (10,120))
+        #screen.blit(y, (10,140))
         pygame.display.update()
         
         if GPIO.input(23) == False:
@@ -193,8 +207,8 @@ while(True):
         #cv2.putText(overlay,now.strftime("%H:%M:%S"),(30,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(1, 1, 0),2,cv2.LINE_AA)
         cv2.putText(frame1,now.strftime("%H:%M:%S"),(20,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),2,cv2.LINE_AA)
         cv2.putText(frame1,"Rec",(275,55),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
-        cv2.putText(frame1,temperature,(show2,200),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
-        cv2.putText(frame1,heart,(show2,230),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        cv2.putText(frame1,str(tempF),(show2,200),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
+        cv2.putText(frame1,bpm,(show2,230),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         cv2.putText(frame1,"Rec-Bio",(215,120),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         cv2.putText(frame1,"Snap",(255,175),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         cv2.putText(frame1,"Menu",(255,230),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
