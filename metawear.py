@@ -15,7 +15,7 @@ class MWBoard:
       return self.s
    
    def getData():
-      reutrn self.s
+      return self.s
       
    def stream(self):
       #I hard coded the address in, just not displaying it here
@@ -41,7 +41,7 @@ class MWBoard:
       device.disconnect()
       time.sleep(1)
 
-g = MWBoard()
-while True:
-   g.stream()
-   print(g.getData())
+#g = MWBoard()
+#while True:
+#   g.stream()
+#   print(g.getData())

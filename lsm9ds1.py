@@ -4,21 +4,11 @@ import time
 import board
 import busio
 import adafruit_lsm9ds1
-
+from firebase import firebase
 # I2C connection:
 i2c = busio.I2C(board.SCL, board.SDA)
 sensor = adafruit_lsm9ds1.LSM9DS1_I2C(i2c)
-
-# SPI connection:
-# from digitalio import DigitalInOut, Direction
-# spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
-# csag = DigitalInOut(board.D5)
-# csag.direction = Direction.OUTPUT
-# csag.value = True
-# csm = DigitalInOut(board.D6)
-# csm.direction = Direction.OUTPUT
-# csm.value = True
-# sensor = adafruit_lsm9ds1.LSM9DS1_SPI(spi, csag, csm)
+time.sleep(1)
 
 # Main loop will read the acceleration, magnetometer, gyroscope, Temperature
 # values every second and print them out.
@@ -28,6 +18,13 @@ while True:
     mag_x, mag_y, mag_z = sensor.magnetic
     gyro_x, gyro_y, gyro_z = sensor.gyro
     temp = sensor.temperature
+
+    #store the Host ID(provided in firebase database) in variable where you want to send the real time sensor data.  
+    #firebase = firebase.FirebaseApplication('https://wear1-38901.firebaseio.com/')
+
+    #store the readings in variable and convert it into string and using firbase.post then data will be posted to databse of firebase 
+    #result = firebase.post('wear1', {'Accel X':str(accel_x),'Accel Y':str(accel_y), 'Accel Z':str(accel_z)}) 
+
     # Print values.
     print(
         "Acceleration (m/s^2): ({0:0.3f},{1:0.3f},{2:0.3f})".format(
