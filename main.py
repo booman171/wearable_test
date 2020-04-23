@@ -25,7 +25,8 @@ import adafruit_mcp9808
 from overlay import overlay_transparent
 from firebase import firebase
 import glob
-from bluetooth import *
+import bluetooth
+
 #from sensor_serial import read_from_port
 #from metawear import MWBoard
 
@@ -41,20 +42,10 @@ os.putenv('SDL_FBDEV', '/dev/fb1')
 os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
 
-server_sock=BluetoothSocket( RFCOMM )
-server_sock.bind(("",PORT_ANY))
-server_sock.listen(1)
-
-port = server_sock.getsockname()[1]
-
-uuid = "94f39d29-7d6d-437d-973b-fba39e49d4ee"
-
-advertise_service( server_sock, "AquaPiServer",
-                   service_id = uuid,
-                   service_classes = [ uuid, SERIAL_PORT_CLASS ],
-                   profiles = [ SERIAL_PORT_PROFILE ],
-#                   protocols = [ OBEX_UUID ]
-                    )
+port = 1    # Raspberry Pi uses port 1 for Bluetooth Communication
+# Creaitng Socket Bluetooth RFCOMM communication
+server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+print('Bluetooth Socket Created')
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(17, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -167,15 +158,24 @@ menu_key = 0
 pointerY=5
 time.sleep(1)
 connect = False
+try: #to connect
+   server.bind((host, port))
+   connected = True
+   print("Bluetooth Binding Completed")
+except:
+   print("Bluetooth Binding Failed")
+server.listen(1) # One connection at a time
+# Server accepts the clients request and assigns a mac address
+client, address = server.accept()
+print("Connected to: ", address)
+print("Client: ", client)
 
 # Video processing
 while(True):
-    try:
-       print("Waiting for connection on RFCOMM channel %d" % port)
-       client_sock, client_info = server_sock.accept()
-       print("Accepted connection from ", client_info)
-       connected = True
-
+    # Receiving the data.
+    data = client.recv(1024) # 1024 is the buffer size.
+    data = str(data, "utf-8")
+    print("Data: ", data)
     if main == True:
         now = datetime.now()
         bigFont = pygame.font.SysFont(None, 48)
@@ -258,16 +258,8 @@ while(True):
                menu_key = menu_key + 1
             time.sleep(0.5)
         if GPIO.input(23) == False:
-           try:
-              data = client_sock.recv(1024)
-              client_sock.send(menu_key)
-           except IOError:
-              pass
-           except KeyboardInterrupt:
-              print("disconnected")
-              client_sock.close()
-              server_sock.close()
-              break
+            send_data = str(menu_key + "\r\n")
+            client.send(send_data)
 
     if cam == True:
         # set each frame from camera as 'frame'
