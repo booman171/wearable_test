@@ -1,5 +1,4 @@
 from __future__ import division
-
 from __future__ import print_function
 from __future__ import absolute_import
 
@@ -42,10 +41,11 @@ os.putenv('SDL_FBDEV', '/dev/fb1')
 os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
 
-port = 1    # Raspberry Pi uses port 1 for Bluetooth Communication
+#host = ""
+#port = 1    # Raspberry Pi uses port 1 for Bluetooth Communication
 # Creaitng Socket Bluetooth RFCOMM communication
-server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-print('Bluetooth Socket Created')
+#server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+#print('Bluetooth Socket Created')
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(17, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -78,24 +78,6 @@ cap = cv2.VideoCapture(0)
 video_type_cv2 = cv2.VideoWriter_fourcc(*'XVID')
 # Save video.avi to current directory
 save_path = os.path.join(filename)
-
-# I2C connection:
-#i2c = busio.I2C(board.SCL, board.SDA)
-#imu = adafruit_lsm9ds1.LSM9DS1_I2C(i2c)
-#mcp = adafruit_mcp9808.MCP9808(i2c)
-
-#accel_x = 0
-#accel_y = 0
-#accel_z = 0
-#mag_x = 0
-#mag_y = 0
-#mag_z = 0
-#gyro_x = 0
-#gyro_y = 0
-#gyro_z = 0
-#imu_temp = 0
-#tempC = 0
-#tempF = 0
 
 # Read in transport image of thermostat icon
 overlay_t = cv2.imread('therm.png', -1)
@@ -138,10 +120,82 @@ def read_from_port():
                   n.write(str(time.time()) + "," + ecg + "," + bpm)
         time.sleep(0.001)
 
+#global connected
+#connected = False
+
+global send
+send = False
+host = ""
+port = 1    # Raspberry Pi uses port 1 for Bluetooth Communication
+# Creaitng Socket Bluetooth RFCOMM communication
+server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+print('Bluetooth Socket Created')
+global connected
+connected = False
+try:  #to connect
+   server.bind((host, port))
+   #connected = True
+   print("Bluetooth Binding Completed")
+except:
+   print("Bluetooth Binding Failed")
+server.listen(1) # One connection at a time
+# Server accepts the clients request and assigns a mac address.
+client, address = server.accept()
+print("Connected To", address)
+print("Client:", client)
+connected = True
+
+def recvMSG():
+   while True:
+      # Receivng the data.
+      data = client.recv(1024) # 1024 is the buffer size.
+      data = str(data,"utf-8")
+      print("JJJJJJJJJJJJJ " + data)
+
+def sendMSG():
+   key = 0
+   while True:
+      if GPIO.input(17) == False:
+         if key == 0:
+            key = 7
+         else:
+            key = key - 1
+         print("KEY: " + str(key))
+         time.sleep(0.5)
+      if GPIO.input(22) == False:
+          if key == 7:
+            key = 0
+          else:
+            key = key + 1
+          time.sleep(0.5)
+          print("KEY: " + str(key))
+
+      if GPIO.input(23) == False:
+         print("sendddd = " + str(key))
+         send = False
+         send_data = str(key) + "\r\n"
+         client.send(send_data)
+         time.sleep(0.5)
+
+      # Receivng the data.
+      #data = client.recv(1024) # 1024 is the buffer size.
+      #data = str(data,"utf-8")
+      #print(data)
+      #global send_data
+      #print(send_data + "SSSSSSSSSSSSSSEEEEEEEEEEEEEEEEEEENNNNNNNNNNNNNNDDDDDDDDDDDDDDDD!!!!!!!!!!!")
+      #send = False
+      #send_data = "received\r\n"
+      #client.send(send_data)
+
 thread = threading.Thread(target=read_from_port)
 thread.start()
 
+sendThread = threading.Thread(target=sendMSG)
+sendThread.start()
+recvThread = threading.Thread(target=recvMSG)
+recvThread.start()
 
+#global connected
 tag_date = ""
 basicfont = pygame.font.SysFont(None, 48)
 
@@ -157,25 +211,10 @@ WHITE = (255, 255, 255)
 menu_key = 0
 pointerY=5
 time.sleep(1)
-connect = False
-try: #to connect
-   server.bind((host, port))
-   connected = True
-   print("Bluetooth Binding Completed")
-except:
-   print("Bluetooth Binding Failed")
-server.listen(1) # One connection at a time
-# Server accepts the clients request and assigns a mac address
-client, address = server.accept()
-print("Connected to: ", address)
-print("Client: ", client)
+
 
 # Video processing
 while(True):
-    # Receiving the data.
-    data = client.recv(1024) # 1024 is the buffer size.
-    data = str(data, "utf-8")
-    print("Data: ", data)
     if main == True:
         now = datetime.now()
         bigFont = pygame.font.SysFont(None, 48)
@@ -200,11 +239,12 @@ while(True):
         #p = medFont.render("Pitch: " + pitch, True, (0, 0, 255))
         #r = medFont.render("Roll: " + roll, True, (0, 0, 255))
         #y = medFont.render("Yaw: " + yaw, True, (0, 0, 255))
+        screen.fill((255, 149, 0))
+        screen.blit(clock, (180, 5))
+        #screen.blit(exit_button, (10,210))
+        screen.blit(cam_button, (10,5))
+
         if connected == True:
-           screen.fill((255, 149, 0))
-           screen.blit(clock, (180, 5))
-           #screen.blit(exit_button, (10,210))
-           screen.blit(cam_button, (10,5))
            screen.blit(play_pause_button, (10,25))
            screen.blit(next_button, (10,45))
            screen.blit(prev_button, (10,65))
@@ -234,7 +274,7 @@ while(True):
            pointerY = 155
         #pygame.draw.rect(screen, (255, 0, 0), (5, pointerY1, 5, pointerY2), 4)
         pygame.draw.circle(screen, (255,0,0), (5, pointerY), 8, 4)
-        print("P: " +  str(pointerY))
+        #print("P: " +  str(pointerY))
 
         screen.blit(temp, (220, 210))
         screen.blit(thermometer, (190,200))
@@ -258,8 +298,11 @@ while(True):
                menu_key = menu_key + 1
             time.sleep(0.5)
         if GPIO.input(23) == False:
-            send_data = str(menu_key + "\r\n")
-            client.send(send_data)
+            send_data = str(menu_key) + "\r\n"
+            send = True
+            print("send")
+            time.sleep(0.5)
+            #send = False
 
     if cam == True:
         # set each frame from camera as 'frame'
@@ -275,7 +318,6 @@ while(True):
         
         # Set opacity for overlay transparency, the closer to 0 the more transparent
         opacity = 0.8
-
         # Overlay date text
         #cv2.putText(overlay,now.strftime("%H:%M:%S"),(30,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(1, 1, 0),2,cv2.LINE_AA)
         cv2.putText(frame1,now.strftime("%H:%M:%S"),(20,50),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),2,cv2.LINE_AA)
