@@ -153,21 +153,22 @@ def recvMSG():
       print("JJJJJJJJJJJJJ " + data)
 
 def sendMSG():
-   key = 0
+   global key
+   key = 1
    while True:
       if GPIO.input(17) == False:
-         if key == 0:
+         if key == 1:
             key = 7
          else:
             key = key - 1
          print("KEY: " + str(key))
-         time.sleep(0.5)
+         time.sleep(1.0)
       if GPIO.input(22) == False:
           if key == 7:
-            key = 0
+            key = 1
           else:
             key = key + 1
-          time.sleep(0.5)
+          time.sleep(1.0)
           print("KEY: " + str(key))
 
       if GPIO.input(23) == False:
@@ -176,16 +177,6 @@ def sendMSG():
          send_data = str(key) + "\r\n"
          client.send(send_data)
          time.sleep(0.5)
-
-      # Receivng the data.
-      #data = client.recv(1024) # 1024 is the buffer size.
-      #data = str(data,"utf-8")
-      #print(data)
-      #global send_data
-      #print(send_data + "SSSSSSSSSSSSSSEEEEEEEEEEEEEEEEEEENNNNNNNNNNNNNNDDDDDDDDDDDDDDDD!!!!!!!!!!!")
-      #send = False
-      #send_data = "received\r\n"
-      #client.send(send_data)
 
 thread = threading.Thread(target=read_from_port)
 thread.start()
@@ -208,84 +199,55 @@ showSensors = False
 ser.readline()
 WHITE = (255, 255, 255)
 #mwboard = MWBoard()
-menu_key = 0
-pointerY=5
+menu_key = 1
+menu_items = ["J", "Play/P", "Next", "Prev", "Vol+", "Vol-", "voice", "Back"]
 time.sleep(1)
-
 
 # Video processing
 while(True):
     if main == True:
         now = datetime.now()
+        ret, frame = cap.read()
+        frame1 = frame.copy()
+        screen.fill([0,0,0])
+
         bigFont = pygame.font.SysFont(None, 48)
         medFont = pygame.font.SysFont(None, 32)
         smallFont = pygame.font.SysFont(None, 24)
-        clock = bigFont.render(now.strftime("%H:%M:%S"), True, (0, 0, 0))
-        play_pause_button = medFont.render("Play/Pause", True, (0, 255, 0))
-        next_button = medFont.render("Next", True, (0, 255, 0))
-        prev_button = medFont.render("Prev", True, (0, 255, 0))
-        vol_up_button = medFont.render("V-Up", True, (0, 255, 0))
-        vol_down_button = medFont.render("V-Down", True, (0, 255, 0))
-        voice_button = medFont.render("Voice", True, (0, 255, 0))
-        back_button = medFont.render("Back", True, (0, 255, 0))
+        clock = bigFont.render(now.strftime("%H:%M:%S"), True, (255, 0, 0))
         up_button = medFont.render("/\\", True, (0, 0, 255))
         down_button = medFont.render("\\/", True, (0, 0, 255))
-        select_button = medFont.render("+", True, (0, 0, 255))
+        select_button = medFont.render(menu_items[key], True, (0, 0, 255))
 
-        cam_button = medFont.render("Cam", True, (0, 255, 0))
-        exit_button = medFont.render("Exit", True, (0, 255, 0))
+        #cam_button = medFont.render("Cam", True, (0, 255, 0))
+        #exit_button = medFont.render("Exit", True, (0, 255, 0))
         temp = medFont.render(str(tempF) + " C", True, (255, 0, 0))
         showBPM = medFont.render("BPM: " + bpm, True, (255, 0, 0))
         #p = medFont.render("Pitch: " + pitch, True, (0, 0, 255))
         #r = medFont.render("Roll: " + roll, True, (0, 0, 255))
         #y = medFont.render("Yaw: " + yaw, True, (0, 0, 255))
-        screen.fill((255, 149, 0))
-        screen.blit(clock, (180, 5))
+        #screen.fill((255, 149, 0))
+        screen.blit(clock, (190, 205))
         #screen.blit(exit_button, (10,210))
-        screen.blit(cam_button, (10,5))
+        #screen.blit(cam_button, (10,5))
+        screen.blit(temp, (5, 50))
+        #screen.blit(thermometer, (190,200))
+        screen.blit(showBPM, (10,210))
 
         if connected == True:
-           screen.blit(play_pause_button, (10,25))
-           screen.blit(next_button, (10,45))
-           screen.blit(prev_button, (10,65))
-           screen.blit(vol_up_button, (10,85))
-           screen.blit(vol_down_button, (10,105))
-           screen.blit(voice_button, (10,125))
-           screen.blit(back_button, (10,145))
-           screen.blit(up_button, (300,30))
-           screen.blit(down_button, (300,70))
-           screen.blit(select_button, (300,110))
+           screen.blit(select_button, (5, 10))
 
-        if menu_key == 0:
-           pointerY = 15
-        elif menu_key == 1:
-           pointerY = 35
-        elif menu_key == 2:
-           pointerY = 55
-        elif menu_key == 3:
-           pointerY = 75
-        elif menu_key == 4:
-           pointerY = 95
-        elif menu_key == 5:
-           pointerY = 115
-        elif menu_key == 6:
-           pointerY = 135
-        elif menu_key == 7:
-           pointerY = 155
-        #pygame.draw.rect(screen, (255, 0, 0), (5, pointerY1, 5, pointerY2), 4)
-        pygame.draw.circle(screen, (255,0,0), (5, pointerY), 8, 4)
-        #print("P: " +  str(pointerY))
+        frame1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB)
+        frame1 =  np.rot90(frame1)
+        frame1 = cv2.flip(frame1, 0)
+        frame1 = pygame.surfarray.make_surface(frame1)
+        screen.blit(frame1, (80,5), (0, 0, 240, 160))
+        #screen.blit(image, (200, 300), (640,512,200,200))
 
-        screen.blit(temp, (220, 210))
-        screen.blit(thermometer, (190,200))
-        screen.blit(showBPM, (10,210))
-        #screen.blit(p, (10,100))
-        #screen.blit(r, (10,120))
-        #screen.blit(y, (10,140))
         pygame.display.update()
 
         if GPIO.input(17) == False:
-            if menu_key == 0:
+            if menu_key == 1:
                menu_key = 7
             else:
                menu_key = menu_key - 1
@@ -293,10 +255,11 @@ while(True):
 
         if GPIO.input(22) == False:
             if menu_key == 7:
-               menu_key = 0
+               menu_key = 1
             else:
                menu_key = menu_key + 1
             time.sleep(0.5)
+
         if GPIO.input(23) == False:
             send_data = str(menu_key) + "\r\n"
             send = True
@@ -312,10 +275,10 @@ while(True):
         # Create overlay of frame add transparent image at screen coordinates (10, 80)
         #overlay = overlay_transparent(frame, overlay_t, 10, 80, (50,50))
         #ov = overlay_transparent(frame1, overlay_t, 5, 80, (50,50))
-        
+
         # Set var now to current date/time
         now = datetime.now()
-        
+
         # Set opacity for overlay transparency, the closer to 0 the more transparent
         opacity = 0.8
         # Overlay date text
@@ -328,7 +291,7 @@ while(True):
         cv2.putText(frame1,"Snap",(255,175),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         cv2.putText(frame1,"Menu",(255,230),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,0),1,cv2.LINE_AA)
         cv2.putText(frame1,"Recording",(show,20),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,255),1,cv2.LINE_AA)
-        
+
         if recording == True:
             out.write(frame)
 
@@ -347,19 +310,19 @@ while(True):
         screen.blit(frame1, (0,0))
         pygame.display.update()
         #print(str(show))
-        
+
         if GPIO.input(17) == False:
             if menu_key == 0:
                menu_key = 7
             else:
                menu_key = menu_key - 1
-        
+
         if GPIO.input(22) == False:
             if menu_key == 7:
                menu_key = 0
             else:
                menu_key = menu_key + 1
-                
+
         if GPIO.input(23) == False and main == False:
             filename = "image_" + now.strftime("%H:%M:%S") + ".jpg"
             save_path = os.path.join(filename)
