@@ -53,7 +53,7 @@ GPIO.setup(22, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(27, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-ser = serial.Serial('/dev/ttyACM0', 115200, timeout=0)
+#ser = serial.Serial('/dev/ttyACM0', 115200, timeout=0)
 #ser.flushInput()
 
 filename1 = "data_ecgggggg" + str(time.time()) + ".csv"
@@ -73,7 +73,7 @@ frames_per_seconds = 30.0
 # Set recording resolution
 my_res = (640, 480) #'480p' # 1080p
 # Read from default (0) camera
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(-1)
 # Set video format
 video_type_cv2 = cv2.VideoWriter_fourcc(*'XVID')
 # Save video.avi to current directory
@@ -144,13 +144,14 @@ client, address = server.accept()
 print("Connected To", address)
 print("Client:", client)
 connected = True
-
 def recvMSG():
+   global recv
    while True:
       # Receivng the data.
       data = client.recv(1024) # 1024 is the buffer size.
       data = str(data,"utf-8")
-      print("JJJJJJJJJJJJJ " + data)
+      print("Received: " + data)
+      recv = data.split(",")
 
 def sendMSG():
    global key
@@ -172,14 +173,14 @@ def sendMSG():
           print("KEY: " + str(key))
 
       if GPIO.input(23) == False:
-         print("sendddd = " + str(key))
+         print("sent: " + str(key))
          send = False
          send_data = str(key) + "\r\n"
          client.send(send_data)
          time.sleep(0.5)
 
-thread = threading.Thread(target=read_from_port)
-thread.start()
+#thread = threading.Thread(target=read_from_port)
+#thread.start()
 
 sendThread = threading.Thread(target=sendMSG)
 sendThread.start()
@@ -196,7 +197,7 @@ cam = False
 main = True
 recording = False
 showSensors = False
-ser.readline()
+#ser.readline()
 WHITE = (255, 255, 255)
 #mwboard = MWBoard()
 menu_key = 1
@@ -213,26 +214,35 @@ while(True):
 
         bigFont = pygame.font.SysFont(None, 48)
         medFont = pygame.font.SysFont(None, 32)
-        smallFont = pygame.font.SysFont(None, 24)
+        smallFont = pygame.font.SysFont(None, 18)
         clock = bigFont.render(now.strftime("%H:%M:%S"), True, (255, 0, 0))
-        up_button = medFont.render("/\\", True, (0, 0, 255))
+        up_button = medFont.render("/\\", True,(0, 0, 255))
         down_button = medFont.render("\\/", True, (0, 0, 255))
         select_button = medFont.render(menu_items[key], True, (0, 0, 255))
 
         #cam_button = medFont.render("Cam", True, (0, 255, 0))
         #exit_button = medFont.render("Exit", True, (0, 255, 0))
-        temp = medFont.render(str(tempF) + " C", True, (255, 0, 0))
-        showBPM = medFont.render("BPM: " + bpm, True, (255, 0, 0))
-        #p = medFont.render("Pitch: " + pitch, True, (0, 0, 255))
-        #r = medFont.render("Roll: " + roll, True, (0, 0, 255))
-        #y = medFont.render("Yaw: " + yaw, True, (0, 0, 255))
+        #temp = medFont.render(str(tempF) + " C", True, (255, 0, 0))
+        #showBPM = medFont.render("BPM: " + bpm, True, (255, 0, 0))
+        lat = smallFont.render("LAT: " + recv[0], True, (0, 0, 255))
+        lon = smallFont.render("LON: " + recv[1], True, (0, 0, 255))
+        alt = smallFont.render("ALT: " + recv[2], True, (0, 0, 255))
+        bea = smallFont.render("BEA: " + recv[3], True, (0, 0, 255))
+        spe = smallFont.render("SPE: " + recv[4], True, (0, 0, 255))
+
         #screen.fill((255, 149, 0))
         screen.blit(clock, (190, 205))
         #screen.blit(exit_button, (10,210))
         #screen.blit(cam_button, (10,5))
-        screen.blit(temp, (5, 50))
+        #screen.blit(temp, (5, 50))
+        screen.blit(lat, (5, 90))
+        screen.blit(lon, (5, 110))
+        screen.blit(alt, (5, 130))
+        screen.blit(bea, (5, 150))
+        screen.blit(spe, (5, 170))
+
         #screen.blit(thermometer, (190,200))
-        screen.blit(showBPM, (10,210))
+        #screen.blit(showBPM, (10,210))
 
         if connected == True:
            screen.blit(select_button, (5, 10))
@@ -270,7 +280,10 @@ while(True):
     if cam == True:
         # set each frame from camera as 'frame'
         ret, frame = cap.read()
-        frame1 = frame.copy()
+        if frame is None:
+           time.sleep(1.0)
+        else:
+           frame1 = frame.copy()
         screen.fill([0,0,0])
         # Create overlay of frame add transparent image at screen coordinates (10, 80)
         #overlay = overlay_transparent(frame, overlay_t, 10, 80, (50,50))
