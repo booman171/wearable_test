@@ -393,3 +393,11 @@ def threadVideoGet(source=0):
                         print("send")
                         time.sleep(0.5)
                         #send = False
+
+@app.route('/video_feed')
+def video_feed():
+        return Response(threadVideoGet(), mimetype='multipart/x-mixed-replace; boundary=frame')
+        
+if __name__ == '__main__':
+        app.run(host='192.168.1.4', debug=True)
+
