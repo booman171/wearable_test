@@ -397,12 +397,15 @@ def threadVideoGet(source=0):
                 frame = video_getter.frame
                 frame1 = frame.copy()
                 
+                
                 frame1=cv2.resize(frame1,None,fx=ds_factor,fy=ds_factor,interpolation=cv2.INTER_AREA)
                 gray=cv2.cvtColor(frame1,cv2.COLOR_BGR2GRAY)
                 ret, jpeg = cv2.imencode('.jpg', frame1)
                 #cv2.imshow("Video", frame1)
                 jpg = jpeg.tobytes()
 
+
+                '''
                 # Start timer (for calculating frame1 rate)
                 t1 = cv2.getTickCount()
 
@@ -452,7 +455,7 @@ def threadVideoGet(source=0):
                 t2 = cv2.getTickCount()
                 time1 = (t2-t1)/freq
                 frame_rate_calc= 1/time1
-                
+                '''
                 if main == True:
                     now = datetime.now()
                     #ret, frame = cap.read()
