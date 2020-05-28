@@ -100,7 +100,6 @@ thermometer = pygame.transform.rotozoom(thermometer, 0, 0.08)
 
 '''
 Tensorflow Code
-'''
 
 # Define VideoStream class to handle streaming of video from webcam in separate processing thread
 # Source - Adrian Rosebrock, PyImageSearch: https://www.pyimagesearch.com/2015/12/28/increasing-raspberry-pi-fps-with-python-and-opencv/
@@ -233,7 +232,7 @@ input_std = 127.5
 frame_rate_calc = 1
 freq = cv2.getTickFrequency()
 
-'''
+
 End Tensorflow Code
 '''
 
@@ -482,6 +481,7 @@ def threadVideoGet(source=0):
                     lat = float(recv[0])
                     lon = float(recv[1])
                     speed = float(recv[4])
+                    '''
                     pygame.draw.rect(screen,redColor,(156,116,10,10))
                     if start < 4:
                        A = lat
@@ -505,7 +505,7 @@ def threadVideoGet(source=0):
                        pygame.draw.rect(screen, yellowColor,Rect(((A-X)* J)+(width/2),((B-Y)*J)+ (height/2),10,10),2)
                        if oldX != 0:
                           pygame.draw.line(screen, yellowColor,  (((A-oldX)* J)+(width/2),((B-oldY)*J)+ (height/2)), (((A-X)* J)+(width/2),((B-Y)*J)+ (height/2)))
-
+                    '''
                     #screen.fill((255, 149, 0))
                     screen.blit(clock, (190, 205))
                     #screen.blit(exit_button, (10,210))
