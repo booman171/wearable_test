@@ -26,6 +26,7 @@ class readUSB:
                 #sensors = message.split(",")
 				#self.data = message.split(",")
 				#self.temperature = sensors[len(sensors)-2]
+                #comment
 			time.sleep(0.01)
 
 	# Start getBPMLoop routine which saves the BPM in its variable
