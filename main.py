@@ -41,10 +41,10 @@ os.putenv('SDL_MOUSEDEV', '/dev/input/mouse0')
 pygame.init()
 #pygame.display.init()
 #time.sleep(1)
-#pygame.mouse.set_visible(False)
+pygame.mouse.set_visible(False)
 
 pygame.display.set_caption("OpenCV camera stream on Pygame")
-#screen = pygame.display.set_mode([320,240])
+screen = pygame.display.set_mode([320,240])
 
 font = pygame.font.SysFont("comicsansms", 72)
 text = font.render("Hello, World", True, (0, 128, 0))
