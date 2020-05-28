@@ -7,7 +7,7 @@ import os
 import numpy as np
 import cv2
 import time
-import picamera
+#import picamera
 import datetime as dt
 import csv
 from datetime import datetime
@@ -19,13 +19,13 @@ import RPi.GPIO as GPIO
 import serial
 import board
 import busio
-import adafruit_lsm9ds1
-import adafruit_mcp9808
+#import adafruit_lsm9ds1
+#import adafruit_mcp9808
 from overlay import overlay_transparent
-from firebase import firebase
+#from firebase import firebase
 import glob
 import bluetooth
-
+#from streamer import StreamingOutput, StreamingHandler, StreamingServer
 import argparse
 #import os
 #import cv2
@@ -35,10 +35,15 @@ from flask import Flask, render_template, Response
 #from sensor_serial import read_from_port
 #from metawear import MWBoard
 
+#os.putenv('SDL_MOUSEDEV', '/dev/input/mouse')
+os.putenv('SDL_MOUSEDEV', '/dev/input/mouse0')
 pygame.init()
-pygame.mouse.set_visible(False)
+#pygame.display.init()
+#time.sleep(1)
+#pygame.mouse.set_visible(False)
+
 pygame.display.set_caption("OpenCV camera stream on Pygame")
-screen = pygame.display.set_mode([320,240])
+#screen = pygame.display.set_mode([320,240])
 
 font = pygame.font.SysFont("comicsansms", 72)
 text = font.render("Hello, World", True, (0, 128, 0))
@@ -79,7 +84,7 @@ frames_per_seconds = 30.0
 # Set recording resolution
 my_res = (640, 480) #'480p' # 1080p
 # Read from default (0) camera
-cap = cv2.VideoCapture(-1)
+#cap = cv2.VideoCapture(-1)
 # Set video format
 video_type_cv2 = cv2.VideoWriter_fourcc(*'XVID')
 # Save video.avi to current directory
@@ -90,7 +95,7 @@ overlay_t = cv2.imread('therm.png', -1)
 thermometer = pygame.image.load('therm.png')
 thermometer = pygame.transform.rotozoom(thermometer, 0, 0.08)
 
-firebase = firebase.FirebaseApplication('https://wear1-38901.firebaseio.com/')
+#firebase = firebase.FirebaseApplication('https://wear1-38901.firebaseio.com/')
 
 # Define method for overlaying trasnparent images
 def handle_data(data):
@@ -120,7 +125,7 @@ def read_from_port():
                #firebase = firebase.FirebaseApplication('https://wear1-38901.firebaseio.com/')
 
                #store the readings in variable and convert it into string and using firbase.post then data will be posted to databse of firebase
-               result = firebase.post('wear1', {'ECG':str(ecg),'BPM':str(bpm), 'Temp F':str(tempF)})
+               #result = firebase.post('wear1', {'ECG':str(ecg),'BPM':str(bpm), 'Temp F':str(tempF)})
 
                with open("serial_data.csv", 'a') as n:
                   n.write(str(time.time()) + "," + ecg + "," + bpm)
@@ -134,6 +139,8 @@ send = False
 host = ""
 port = 1    # Raspberry Pi uses port 1 for Bluetooth Communication
 # Creaitng Socket Bluetooth RFCOMM communication
+
+
 server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
 print('Bluetooth Socket Created')
 global connected
@@ -150,13 +157,14 @@ client, address = server.accept()
 print("Connected To", address)
 print("Client:", client)
 connected = True
+
 def recvMSG():
    global recv
    while True:
       # Receivng the data.
       data = client.recv(1024) # 1024 is the buffer size.
       data = str(data,"utf-8")
-      print("Received: " + data)
+      #print("Received: " + data)
       recv = data.split(",")
 
 def sendMSG():
@@ -210,13 +218,6 @@ menu_key = 1
 menu_items = ["J", "Play/P", "Next", "Prev", "Vol+", "Vol-", "voice", "Back"]
 time.sleep(1)
 
-
-app = Flask(__name__)
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-
 ds_factor = 0.6
 
 #global frame
@@ -225,6 +226,23 @@ def threadVideoGet(source=0):
         Thread for getting video from get_video
         '''
         video_getter = VideoGet(source).start()
+        global menu_key
+
+        width = 320
+        height = 240
+
+        blackColor =  pygame.Color(  0,  0, 0)
+        yellowColor = pygame.Color(255,255, 0)
+        redColor =    pygame.Color(255,  0, 0)
+        greenColor =  pygame.Color(  0,255, 0)
+
+        oldX = 0
+        oldY = 0
+
+        # set SCALE
+        J = 100000
+        start = 0
+
         while True:
                 if (cv2.waitKey(1) == ord("q")) or video_getter.stopped:
                         video_getter.stop()
@@ -235,7 +253,7 @@ def threadVideoGet(source=0):
                 ret, jpeg = cv2.imencode('.jpg', frame)
                 #cv2.imshow("Video", frame)
                 jpg = jpeg.tobytes()
-                '''
+
                 if main == True:
                     now = datetime.now()
                     #ret, frame = cap.read()
@@ -254,19 +272,45 @@ def threadVideoGet(source=0):
                     #exit_button = medFont.render("Exit", True, (0, 255, 0))
                     #temp = medFont.render(str(tempF) + " C", True, (255, 0, 0))
                     #showBPM = medFont.render("BPM: " + bpm, True, (255, 0, 0))
-                    lat = smallFont.render("LAT: " + recv[0], True, (0, 0, 255))
-                    lon = smallFont.render("LON: " + recv[1], True, (0, 0, 255))
+                    lattitude = smallFont.render("LAT: " + recv[0], True, (0, 0, 255))
+                    longitude = smallFont.render("LON: " + recv[1], True, (0, 0, 255))
                     alt = smallFont.render("ALT: " + recv[2], True, (0, 0, 255))
                     bea = smallFont.render("BEA: " + recv[3], True, (0, 0, 255))
                     spe = smallFont.render("SPE: " + recv[4], True, (0, 0, 255))
+                    lat = float(recv[0])
+                    lon = float(recv[1])
+                    speed = float(recv[4])
+                    pygame.draw.rect(screen,redColor,(156,116,10,10))
+                    if start < 4:
+                       A = lat
+                       B = lon
+                       pygame.draw.rect(screen, redColor,Rect((width/2)- 4,(height/2) - 4,100,50),2)
+                       start += 1
+                    if start == 4:
+                       #now = datetime.datetime.now()
+                       #timestamp = now.strftime("%y/%m/%d-%H:%M:%S")
+                       #timp = "TIME:, " + str(timestamp) + ", LAT:, " + str(lat) + ", LON:, " + str(lon) + ", SPEED:, " + str(speed) + ", ANGLE:, " + str(angle)  + "\n"
+                       #with open("/run/shm/log.txt", "a") as file:
+                       #   file.write(timp)
+                       start +=1
+                    else:
+                       start += 1
+                       X = lat
+                       Y = lon
+                       pygame.draw.rect(screen, redColor,Rect(((A-X)* J)+(width/2),((B-Y)*J)+ (height/2),10,10),2)
+                       #pygame.display.update()
+                       time.sleep(.25)
+                       pygame.draw.rect(screen, yellowColor,Rect(((A-X)* J)+(width/2),((B-Y)*J)+ (height/2),10,10),2)
+                       if oldX != 0:
+                          pygame.draw.line(screen, yellowColor,  (((A-oldX)* J)+(width/2),((B-oldY)*J)+ (height/2)), (((A-X)* J)+(width/2),((B-Y)*J)+ (height/2)))
 
                     #screen.fill((255, 149, 0))
                     screen.blit(clock, (190, 205))
                     #screen.blit(exit_button, (10,210))
                     #screen.blit(cam_button, (10,5))
                     #screen.blit(temp, (5, 50))
-                    screen.blit(lat, (5, 90))
-                    screen.blit(lon, (5, 110))
+                    screen.blit(lattitude, (5, 90))
+                    screen.blit(longitude, (5, 110))
                     screen.blit(alt, (5, 130))
                     screen.blit(bea, (5, 150))
                     screen.blit(spe, (5, 170))
@@ -306,14 +350,8 @@ def threadVideoGet(source=0):
                         print("send")
                         time.sleep(0.5)
                         #send = False
-                        '''
-                yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + jpg + b'\r\n\r\n')
-
-
-@app.route('/video_feed')
-def video_feed():
-        return Response(threadVideoGet(), mimetype='multipart/x-mixed-replace; boundary=frame')
+                #yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + jpg + b'\r\n\r\n')
 
 while True:
-        app.run(host='192.168.1.4', debug=True)
+	threadVideoGet()
 
