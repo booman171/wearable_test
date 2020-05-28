@@ -221,8 +221,8 @@ interpreter.allocate_tensors()
 # Get model details
 input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
-height = input_details[0]['shape'][1]
-width = input_details[0]['shape'][2]
+tf_height = input_details[0]['shape'][1]
+tf_width = input_details[0]['shape'][2]
 
 floating_model = (input_details[0]['dtype'] == np.float32)
 
@@ -407,7 +407,7 @@ def threadVideoGet(source=0):
                 t1 = cv2.getTickCount()
 
                 frame1_rgb = cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB)
-                frame1_resized = cv2.resize(frame1_rgb, (width, height))
+                frame1_resized = cv2.resize(frame1_rgb, (tf_width, tf_height))
                 input_data = np.expand_dims(frame1_resized, axis=0)
                 
                 # Normalize pixel values if using a floating model (i.e. if model is non-quantized)
