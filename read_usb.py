@@ -20,7 +20,10 @@ class readUSB:
 			#self.ser = serial.Serial("/dev/" + self.port, self.baud, timeout=0)
 			if(self.ser.inWaiting()>0):
 				ser_bytes = self.ser.read(self.ser.inWaiting()).decode('ascii')
-				self.message = str(ser_bytes)
+                self.message = str(ser_bytes)
+                self.message = self.message.replace("\r","")
+                self.message = self.message.replace("\n","")
+                #sensors = message.split(",")
 				#self.data = message.split(",")
 				#self.temperature = sensors[len(sensors)-2]
 			time.sleep(0.01)
@@ -37,6 +40,8 @@ class readUSB:
 		self.thread.stopped = True
 		return
 
+
+'''
 arduino1 = readUSB("ttyACM0", 9600)
 arduino1.startSensorRead()
 
@@ -45,3 +50,4 @@ try:
 		print(arduino1.getData())
 except:
 	arduino1.stopSensorRead()
+'''
