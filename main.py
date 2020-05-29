@@ -366,9 +366,6 @@ def threadVideoGet(source=0):
                         break
                 frame = video_getter.frame
                 frame1 = frame.copy()
-
-                if record == True:
-                   video_out.write(frame)
                    
                 frame1=cv2.resize(frame1,None,fx=ds_factor,fy=ds_factor,interpolation=cv2.INTER_AREA)
                 gray=cv2.cvtColor(frame1,cv2.COLOR_BGR2GRAY)
@@ -486,6 +483,10 @@ def threadVideoGet(source=0):
                        if oldX != 0:
                           pygame.draw.line(screen, yellowColor,  (((A-oldX)* J)+(width/2),((B-oldY)*J)+ (height/2)), (((A-X)* J)+(width/2),((B-Y)*J)+ (height/2)))
                     '''
+                    
+                    if record == True:
+                       video_out.write(frame)
+                   
                     #screen.fill((255, 149, 0))
                     screen.blit(clock, (190, 205))
                     #screen.blit(exit_button, (10,210))
