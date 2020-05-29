@@ -442,14 +442,19 @@ def threadVideoGet(source=0):
                     #exit_button = medFont.render("Exit", True, (0, 255, 0))
                     temp = medFont.render(tempF + " C", True, (255, 0, 0))
                     #showBPM = medFont.render("BPM: " + bpm, True, (255, 0, 0))
-                    lattitude = smallFont.render("LAT: " + recv[0], True, (0, 0, 255))
-                    longitude = smallFont.render("LON: " + recv[1], True, (0, 0, 255))
-                    alt = smallFont.render("ALT: " + recv[2], True, (0, 0, 255))
-                    bea = smallFont.render("BEA: " + recv[3], True, (0, 0, 255))
-                    spe = smallFont.render("SPE: " + recv[4], True, (0, 0, 255))
-                    lat = float(recv[0])
-                    lon = float(recv[1])
-                    speed = float(recv[4])
+                    if len(recv) > 1:
+                       lattitude = smallFont.render("LAT: " + recv[0], True, (0, 0, 255))
+                    if len(recv) > 2:
+                       longitude = smallFont.render("LON: " + recv[1], True, (0, 0, 255))
+                    if len(recv) > 3:
+                       alt = smallFont.render("ALT: " + recv[2], True, (0, 0, 255))
+                    if len(recv) > 4:
+                       bea = smallFont.render("BEA: " + recv[3], True, (0, 0, 255))
+                    if len(recv) > 5:
+                       spe = smallFont.render("SPE: " + recv[4], True, (0, 0, 255))
+                    #lat = float(recv[0])
+                    #lon = float(recv[1])
+                    #speed = float(recv[4])
                     '''
                     pygame.draw.rect(screen,redColor,(156,116,10,10))
                     if start < 4:
