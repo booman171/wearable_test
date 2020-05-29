@@ -82,13 +82,14 @@ declination = -0.106988683
 # Set filename video.avi for recording camera output
 filename = 'video' + timestr + '.avi' # .avi .mp4
 # Set picamera standard frame rate
-frames_per_seconds = 30.0
+fps = 20.0
 # Set recording resolution
-my_res = (640, 480) #'480p' # 1080p
+my_res = (320, 240) #'480p' # 1080p
 # Read from default (0) camera
 #cap = cv2.VideoCapture(-1)
 # Set video format
-video_type_cv2 = cv2.VideoWriter_fourcc(*'XVID')
+video_writer = cv2.VideoWriter_fourcc(filename, *'XVID')
+video_out = cv2.VideoWriter(filename, video_writer, fps, my_res)
 # Save video.avi to current directory
 save_path = os.path.join(filename)
 
@@ -238,7 +239,6 @@ End Tensorflow Code
 '''
 
 
-
 #global connected
 #connected = False
 
@@ -317,6 +317,7 @@ show = 400
 show2 = 400
 cam = False
 main = True
+record = False
 recording = False
 showSensors = False
 #ser.readline()
@@ -491,6 +492,8 @@ def threadVideoGet(source=0):
                     screen.blit(bea, (5, 150))
                     screen.blit(spe, (5, 170))
 
+                    if record == True:
+                       video_out.write(frame)
                     #screen.blit(thermometer, (190,200))
                     #screen.blit(showBPM, (10,210))
 
@@ -526,6 +529,15 @@ def threadVideoGet(source=0):
                         print("send")
                         time.sleep(0.5)
                         #send = False
+                        
+                    if GPIO.input(27) == False:
+                        if record == True:
+                           record = False
+                           video_out.release()
+                        if record == False:
+                           record = True
+                        
+                        
                 #yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + jpg + b'\r\n\r\n')
 
 while True:
