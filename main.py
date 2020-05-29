@@ -82,7 +82,7 @@ declination = -0.106988683
 # Set filename video.avi for recording camera output
 filename = 'video' + timestr + '.avi' # .avi .mp4
 # Set picamera standard frame rate
-fps = 8.0
+fps = 30.0
 # Set recording resolution
 #capture = cv2.VideoCapture(0)
 #frame_width = int(capture.get(3))
@@ -361,7 +361,7 @@ def threadVideoGet(source=0):
         # set SCALE
         J = 100000
         start = 0
-
+        print("vfvdsvdF")
         while True:
                 if (cv2.waitKey(1) == ord("q")) or video_getter.stopped:
                         video_getter.stop()
