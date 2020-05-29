@@ -494,11 +494,6 @@ def threadVideoGet(source=0):
                     screen.blit(bea, (5, 150))
                     screen.blit(spe, (5, 170))
 
-                    if record == True:
-                       video_out.write(frame)
-                    #screen.blit(thermometer, (190,200))
-                    #screen.blit(showBPM, (10,210))
-
                     if connected == True:
                        screen.blit(select_button, (5, 10))
 
@@ -509,6 +504,11 @@ def threadVideoGet(source=0):
                     screen.blit(frame1, (80,5), (0, 0, 240, 160))
                     #screen.blit(image, (200, 300), (640,512,200,200))
 
+                    if record == True:
+                       video_out.write(frame)
+                    #screen.blit(thermometer, (190,200))
+                    #screen.blit(showBPM, (10,210))
+                    
                     pygame.display.update()
 
                     if GPIO.input(17) == False:
