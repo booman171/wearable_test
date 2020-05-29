@@ -1,17 +1,18 @@
+#!pip install sk-video
 import cv2
-
-camera = cv2.VideoCapture(-1)
-
-camera.set(3, 320)
-camera.set(4, 240)
-
+from skvideo.io import vwrite
+from skvideo.io import FFmpegWriter
+cap = cv2.VideoCapture('Input.mp4')
+fps=cap.get(cv2.CAP_PROP_FPS)
+W=int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+H=int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+out = FFmpegWriter('Output.avi', 
+            inputdict={'-r': str(fps), '-s':'{}x{}'.format(W,H)},
+            outputdict={'-r': str(fps), '-c:v': 'libx264', '-preset': 'ultrafast', '-pix_fmt': 'yuv444p'})
 while True:
-    ret, image = camera.read()
-
-    #cv2.imshow('Webcam', image)
-
-    if cv2.waitKey(0) & 0xFF == ord('q'):
-        break
-
-camera.release()
-cv2.destroyAllWindows()
+  success , frame = cap.read()
+  if success==True:
+    out.writeFrame(frame)
+  else:
+    break
+cap.release()

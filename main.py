@@ -84,14 +84,14 @@ filename = 'video' + timestr + '.avi' # .avi .mp4
 # Set picamera standard frame rate
 fps = 20.0
 # Set recording resolution
-capture = cv2.VideoCapture(0)
-frame_width = int(capture.get(3))
-frame_height = int(capture.get(4))
+#capture = cv2.VideoCapture(0)
+#frame_width = int(capture.get(3))
+#frame_height = int(capture.get(4))
 # Read from default (0) camera
 #cap = cv2.VideoCapture(-1)
 # Set video format
 video_writer = cv2.VideoWriter_fourcc('M','J','P','G')
-video_out = cv2.VideoWriter(filename, video_writer, fps, (frame_width, frame_height))
+video_out = cv2.VideoWriter(filename, video_writer, fps, (640, 480))
 # Save video.avi to current directory
 save_path = os.path.join(filename)
 
