@@ -505,7 +505,7 @@ def threadVideoGet(source=0):
                     #screen.blit(image, (200, 300), (640,512,200,200))
 
                     if record == True:
-                       video_out.write(frame)
+                       video_out.write(frame1)
                     #screen.blit(thermometer, (190,200))
                     #screen.blit(showBPM, (10,210))
                     
