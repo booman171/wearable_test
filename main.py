@@ -89,7 +89,7 @@ my_res = (320, 240) #'480p' # 1080p
 #cap = cv2.VideoCapture(-1)
 # Set video format
 video_writer = cv2.VideoWriter_fourcc(*'XVID')
-video_out = cv2.VideoWriter(filename, -1, fps, my_res)
+video_out = cv2.VideoWriter(filename, cv.CV_FOURCC(*'DIVX'), fps, my_res)
 # Save video.avi to current directory
 save_path = os.path.join(filename)
 
