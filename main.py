@@ -317,8 +317,7 @@ show = 400
 show2 = 400
 cam = False
 main = True
-record = False
-recording = False
+
 showSensors = False
 #ser.readline()
 WHITE = (255, 255, 255)
@@ -342,7 +341,10 @@ def threadVideoGet(source=0):
         '''
         video_getter = VideoGet(source).start()
         global menu_key
-
+        global record
+        global recording
+        record = False
+        recording = False
         width = 320
         height = 240
 
