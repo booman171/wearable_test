@@ -367,6 +367,9 @@ def threadVideoGet(source=0):
                 frame = video_getter.frame
                 frame1 = frame.copy()
 
+                if record == True:
+                   video_out.write(frame)
+                   
                 frame1=cv2.resize(frame1,None,fx=ds_factor,fy=ds_factor,interpolation=cv2.INTER_AREA)
                 gray=cv2.cvtColor(frame1,cv2.COLOR_BGR2GRAY)
                 ret, jpeg = cv2.imencode('.jpg', frame1)
@@ -504,8 +507,6 @@ def threadVideoGet(source=0):
                     screen.blit(frame1, (80,5), (0, 0, 240, 160))
                     #screen.blit(image, (200, 300), (640,512,200,200))
 
-                    if record == True:
-                       video_out.write(frame1)
                     #screen.blit(thermometer, (190,200))
                     #screen.blit(showBPM, (10,210))
                     
