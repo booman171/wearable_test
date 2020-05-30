@@ -343,8 +343,6 @@ def threadVideoGet(source=0):
         '''
         video_getter = VideoGet(source).start()
         global menu_key
-        global record
-        global recording
         record = False
         recording = False
         width = 320
@@ -354,6 +352,7 @@ def threadVideoGet(source=0):
         yellowColor = pygame.Color(255,255, 0)
         redColor =    pygame.Color(255,  0, 0)
         greenColor =  pygame.Color(  0,255, 0)
+        rec_color = pygame.Color(255,255, 0)
 
         oldX = 0
         oldY = 0
@@ -375,8 +374,10 @@ def threadVideoGet(source=0):
                 #cv2.imshow("Video", frame1)
                 jpg = jpeg.tobytes()
 
-                temperature = arduino1.getData()
-                tempF = "Temp: " + temperature
+                data = arduino1.getData().split(",")
+                if len(arduino1.getData()) >= 2:
+                   bpm = "BPM: " + data[0]
+                   tempF = "Temp: " + data[1][0:3] + " F"
 
                 '''
                 # Start timer (for calculating frame1 rate)
@@ -438,15 +439,15 @@ def threadVideoGet(source=0):
                     bigFont = pygame.font.SysFont(None, 48)
                     medFont = pygame.font.SysFont(None, 32)
                     smallFont = pygame.font.SysFont(None, 18)
-                    clock = bigFont.render(now.strftime("%H:%M:%S"), True, (255, 0, 0))
+                    clock = bigFont.render(now.strftime("%H:%M:%S"), True, (0, 255, 0))
                     up_button = medFont.render("/\\", True,(0, 0, 255))
                     down_button = medFont.render("\\/", True, (0, 0, 255))
                     select_button = medFont.render(menu_items[key], True, (0, 0, 255))
 
-                    #cam_button = medFont.render("Cam", True, (0, 255, 0))
+                    rec_button  = medFont.render("REC", True, rec_color)
                     #exit_button = medFont.render("Exit", True, (0, 255, 0))
-                    temp = medFont.render(tempF + " C", True, (255, 0, 0))
-                    #showBPM = medFont.render("BPM: " + bpm, True, (255, 0, 0))
+                    temp = medFont.render(tempF, True, (0, 0, 255))
+                    showBPM = medFont.render(bpm, True, (0, 0, 255))
                     if len(recv) > 1:
                        lattitude = smallFont.render("LAT: " + recv[0], True, (0, 0, 255))
                     if len(recv) > 2:
@@ -486,22 +487,24 @@ def threadVideoGet(source=0):
                           pygame.draw.line(screen, yellowColor,  (((A-oldX)* J)+(width/2),((B-oldY)*J)+ (height/2)), (((A-X)* J)+(width/2),((B-Y)*J)+ (height/2)))
                     '''
                     
-                    if record == True:
-                       video_out.write(frame)
-                   
                     #screen.fill((255, 149, 0))
                     screen.blit(clock, (190, 205))
+                    screen.blit(rec_button, (270, 180))
                     #screen.blit(exit_button, (10,210))
                     #screen.blit(cam_button, (10,5))
                     screen.blit(temp, (5, 205))
-                    screen.blit(lattitude, (5, 90))
-                    screen.blit(longitude, (5, 110))
+                    screen.blit(showBPM, (5, 180))
+                    #screen.blit(lattitude, (5, 90))
+                    #screen.blit(longitude, (5, 110))
                     screen.blit(alt, (5, 130))
-                    screen.blit(bea, (5, 150))
-                    screen.blit(spe, (5, 170))
+                    #screen.blit(bea, (5, 150))
+                    screen.blit(spe, (5, 150))
 
                     if connected == True:
                        screen.blit(select_button, (5, 10))
+
+                    if record == True:
+                       video_out.write(frame1)
 
                     frame1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB)
                     frame1 =  np.rot90(frame1)
@@ -538,10 +541,16 @@ def threadVideoGet(source=0):
                         
                     if GPIO.input(27) == False:
                         if record == True:
+                           print("Recording stopped: " + str(record))
+                           rec_color = pygame.Color(255,255, 0)
                            record = False
                            video_out.release()
-                        if record == False:
+                           time.sleep(0.5)
+                        else:
+                           print("Recording: " + str(record))
+                           rec_color = pygame.Color(255,  0, 0)
                            record = True
+                           time.sleep(0.5)
                         
                     if cv2.waitKey(300) & 0xFF == ord('q'):
                        break

@@ -23,7 +23,7 @@ class readUSB:
 				self.message = str(ser_bytes)
 				self.message = self.message.replace("\r","")
 				self.message = self.message.replace("\n","")
-				#sensors = message.split(",")
+				#self.sensors = self.message.split(",")
 				#self.data = message.split(",")
 				#self.temperature = sensors[len(sensors)-2]
                 #comment
