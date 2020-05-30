@@ -433,7 +433,7 @@ def threadVideoGet(source=0):
                 if main == True:
                     now = datetime.now()
                     #ret, frame = cap.read()
-                    #frame1 = frame.copy()
+                    cam_out = frame.copy()
                     screen.fill([0,0,0])
 
                     bigFont = pygame.font.SysFont(None, 48)
@@ -499,12 +499,18 @@ def threadVideoGet(source=0):
                     screen.blit(alt, (5, 130))
                     #screen.blit(bea, (5, 150))
                     screen.blit(spe, (5, 150))
+                    
+                    cv2.putText(cam_out, now.strftime("%H:%M:%S"),(10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
+                    cv2.putText(cam_out, tempF,(50, 130), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
+                    cv2.putText(cam_out, bpm,(100, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
+                    cv2.putText(cam_out, recv[2],(130, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
+                    cv2.putText(cam_out, recv[4],(300, 220), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
 
                     if connected == True:
                        screen.blit(select_button, (5, 10))
 
                     if record == True:
-                       video_out.write(frame1)
+                       video_out.write(cam_out)
 
                     frame1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB)
                     frame1 =  np.rot90(frame1)
