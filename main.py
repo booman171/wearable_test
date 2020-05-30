@@ -365,7 +365,7 @@ def threadVideoGet(source=0):
         start = 0
         print("vfvdsvdF")
         while True:
-                if (cv2.waitKey(1) == ord("q")) or video_getter.stopped:
+                if (cv2.waitKey(15) == ord("q")) or video_getter.stopped:
                         video_getter.stop()
                         break
                 frame = video_getter.frame
@@ -570,9 +570,6 @@ def threadVideoGet(source=0):
                            rec_color = pygame.Color(255,  0, 0)
                            record = True
                            time.sleep(0.5)
-                        
-                    if cv2.waitKey(1) & 0xFF == ord('q'):
-                       break
                 #yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + jpg + b'\r\n\r\n')
 
 while True:
