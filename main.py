@@ -504,7 +504,7 @@ def threadVideoGet(source=0):
                     screen.blit(spe, (5, 150))
                     
                     cv2.putText(cam_out, now.strftime("%H:%M:%S"),(10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 3)
-                    cv2.putText(cam_out, tempF,(500, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 3)
+                    cv2.putText(cam_out, tempF,(470, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 3)
                     cv2.putText(cam_out, bpm,(10, 350), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
                     cv2.putText(cam_out, "Altitude: " + recv[2],(10, 430), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 0, 0), 3)
                     cv2.putText(cam_out, "Speed: " + recv[4],(10, 390), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 0, 0), 3)
@@ -564,7 +564,7 @@ def threadVideoGet(source=0):
                            record = True
                            time.sleep(0.5)
                         
-                    if cv2.waitKey(1000) & 0xFF == ord('q'):
+                    if cv2.waitKey(1) & 0xFF == ord('q'):
                        break
                 #yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + jpg + b'\r\n\r\n')
 
