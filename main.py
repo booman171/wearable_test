@@ -501,10 +501,10 @@ def threadVideoGet(source=0):
                     screen.blit(spe, (5, 150))
                     
                     cv2.putText(cam_out, now.strftime("%H:%M:%S"),(10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
-                    cv2.putText(cam_out, tempF,(240, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
+                    cv2.putText(cam_out, tempF,(300, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
                     cv2.putText(cam_out, bpm,(10, 330), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
-                    cv2.putText(cam_out, recv[2],(130, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
-                    cv2.putText(cam_out, recv[4],(300, 220), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
+                    cv2.putText(cam_out, "Altitude: " + recv[2],(10, 410), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
+                    cv2.putText(cam_out, "Speed: " + recv[4],(10, 370), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
 
                     if connected == True:
                        screen.blit(select_button, (5, 10))
@@ -558,7 +558,7 @@ def threadVideoGet(source=0):
                            record = True
                            time.sleep(0.5)
                         
-                    if cv2.waitKey(300) & 0xFF == ord('q'):
+                    if cv2.waitKey(20) & 0xFF == ord('q'):
                        break
                 #yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + jpg + b'\r\n\r\n')
 
