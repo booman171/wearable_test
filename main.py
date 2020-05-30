@@ -358,6 +358,8 @@ def threadVideoGet(source=0):
         oldX = 0
         oldY = 0
 
+        frames = []
+
         # set SCALE
         J = 100000
         start = 0
@@ -504,13 +506,14 @@ def threadVideoGet(source=0):
                     screen.blit(spe, (5, 150))
                     
                     cv2.putText(cam_out, now.strftime("%H:%M:%S"),(10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 3)
-                    cv2.putText(cam_out, tempF,(470, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 3)
+                    cv2.putText(cam_out, tempF,(440, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 3)
                     cv2.putText(cam_out, bpm,(10, 350), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
                     cv2.putText(cam_out, "Altitude: " + recv[2],(10, 430), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 0, 0), 3)
                     cv2.putText(cam_out, "Speed: " + recv[4],(10, 390), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 0, 0), 3)
 
                     # apply the overlay
                     cv2.addWeighted(cam_out, alpha, output, 1 - alpha, 0, output)
+                    frames.append(output)
 
                     if connected == True:
                        screen.blit(select_button, (5, 10))
@@ -554,12 +557,16 @@ def threadVideoGet(source=0):
                     if GPIO.input(27) == False:
                         if record == True:
                            print("Recording stopped: " + str(record))
-                           rec_color = pygame.Color(255,255, 0)
+                           rec_color = pygame.Color(0,255, 0)
                            record = False
+                           for num in frames:
+                               video_out.write(num)
                            video_out.release()
+                           rec_color = pygame.Color(255,255, 0)
                            time.sleep(0.5)
                         else:
                            print("Recording: " + str(record))
+                           frames = []
                            rec_color = pygame.Color(255,  0, 0)
                            record = True
                            time.sleep(0.5)
