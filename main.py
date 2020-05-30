@@ -501,8 +501,8 @@ def threadVideoGet(source=0):
                     screen.blit(spe, (5, 150))
                     
                     cv2.putText(cam_out, now.strftime("%H:%M:%S"),(10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
-                    cv2.putText(cam_out, tempF,(50, 130), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
-                    cv2.putText(cam_out, bpm,(100, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
+                    cv2.putText(cam_out, tempF,(240, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
+                    cv2.putText(cam_out, bpm,(10, 330), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
                     cv2.putText(cam_out, recv[2],(130, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
                     cv2.putText(cam_out, recv[4],(300, 220), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
 
