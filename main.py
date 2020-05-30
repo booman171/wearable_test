@@ -82,7 +82,7 @@ declination = -0.106988683
 # Set filename video.avi for recording camera output
 filename = 'video' + timestr + '.avi' # .avi .mp4
 # Set picamera standard frame rate
-fps = 7.0
+fps = 5.0
 # Set recording resolution
 #capture = cv2.VideoCapture(0)
 #frame_width = int(capture.get(3))
