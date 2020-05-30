@@ -354,6 +354,7 @@ def threadVideoGet(source=0):
         greenColor =  pygame.Color(  0,255, 0)
         rec_color = pygame.Color(255,255, 0)
 
+        alpha = 0.4
         oldX = 0
         oldY = 0
 
@@ -434,6 +435,8 @@ def threadVideoGet(source=0):
                     now = datetime.now()
                     #ret, frame = cap.read()
                     cam_out = frame.copy()
+                    output = frame.copy()
+
                     screen.fill([0,0,0])
 
                     bigFont = pygame.font.SysFont(None, 48)
@@ -500,17 +503,20 @@ def threadVideoGet(source=0):
                     #screen.blit(bea, (5, 150))
                     screen.blit(spe, (5, 150))
                     
-                    cv2.putText(cam_out, now.strftime("%H:%M:%S"),(10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 3)
+                    cv2.putText(cam_out, now.strftime("%H:%M:%S"),(10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 3)
                     cv2.putText(cam_out, tempF,(500, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 3)
                     cv2.putText(cam_out, bpm,(10, 350), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
                     cv2.putText(cam_out, "Altitude: " + recv[2],(10, 430), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 0, 0), 3)
                     cv2.putText(cam_out, "Speed: " + recv[4],(10, 390), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 0, 0), 3)
 
+                    # apply the overlay
+                    cv2.addWeighted(cam_out, alpha, output, 1 - alpha, 0, output)
+
                     if connected == True:
                        screen.blit(select_button, (5, 10))
 
                     if record == True:
-                       video_out.write(cam_out)
+                       video_out.write(output)
 
                     frame1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB)
                     frame1 =  np.rot90(frame1)
@@ -558,7 +564,7 @@ def threadVideoGet(source=0):
                            record = True
                            time.sleep(0.5)
                         
-                    if cv2.waitKey(20) & 0xFF == ord('q'):
+                    if cv2.waitKey(1000) & 0xFF == ord('q'):
                        break
                 #yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + jpg + b'\r\n\r\n')
 
