@@ -543,7 +543,8 @@ def threadVideoGet(source=0):
                         if record == False:
                            record = True
                         
-                        
+                    if cv2.waitKey(300) & 0xFF == ord('q'):
+                       break
                 #yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + jpg + b'\r\n\r\n')
 
 while True:
