@@ -46,7 +46,6 @@ pygame.mouse.set_visible(False)
 
 pygame.display.set_caption("OpenCV camera stream on Pygame")
 screen = pygame.display.set_mode([320,240])
-
 font = pygame.font.SysFont("comicsansms", 72)
 text = font.render("Hello, World", True, (0, 128, 0))
 
@@ -75,14 +74,14 @@ f.write("Epoch,ECG,BPM" + "\n")
 #f.close
 
 # Set time at start of program
-start = time.monotonic()
-timestr = time.strftime("%Y%m%d-%H%M%S")
+#start = time.monotonic()
+#timestr = time.strftime("%Y%m%d-%H%M%S")
 # Set declination based on location http://www.magnetic-declination.com/
-declination = -0.106988683
+#declination = -0.106988683
 # Set filename video.avi for recording camera output
-filename = 'video' + timestr + '.avi' # .avi .mp4
+#filename = 'video' + timestr + '.avi' # .avi .mp4
 # Set picamera standard frame rate
-fps = 5.0
+#fps = 5.0
 # Set recording resolution
 #capture = cv2.VideoCapture(0)
 #frame_width = int(capture.get(3))
@@ -90,10 +89,10 @@ fps = 5.0
 # Read from default (0) camera
 #cap = cv2.VideoCapture(-1)
 # Set video format
-video_writer = cv2.VideoWriter_fourcc('M','J','P','G')
-video_out = cv2.VideoWriter(filename, video_writer, fps, (640, 480))
+#video_writer = cv2.VideoWriter_fourcc('M','J','P','G')
+#video_out = cv2.VideoWriter(filename, video_writer, fps, (640, 480))
 # Save video.avi to current directory
-save_path = os.path.join(filename)
+#save_path = os.path.join(filename)
 
 # Read in transport image of thermostat icon
 overlay_t = cv2.imread('therm.png', -1)
@@ -530,7 +529,7 @@ def threadVideoGet(source=0):
 
                     #screen.blit(thermometer, (190,200))
                     #screen.blit(showBPM, (10,210))
-                    
+
                     pygame.display.update()
 
                     if GPIO.input(17) == False:
@@ -553,7 +552,7 @@ def threadVideoGet(source=0):
                         print("send")
                         time.sleep(0.5)
                         #send = False
-                        
+
                     if GPIO.input(27) == False:
                         if record == True:
                            print("Recording stopped: " + str(record))
@@ -567,6 +566,11 @@ def threadVideoGet(source=0):
                         else:
                            print("Recording: " + str(record))
                            frames = []
+                           timestr = time.strftime("%Y%m%d-%H%M%S")
+                           filename = 'video' + timestr + '.avi' # .avi .mp4
+                           fps = 5.0
+                           video_writer = cv2.VideoWriter_fourcc('M','J','P','G')
+                           video_out = cv2.VideoWriter(filename, video_writer, fps, (640, 480))
                            rec_color = pygame.Color(255,  0, 0)
                            record = True
                            time.sleep(0.5)
