@@ -289,7 +289,7 @@ def threadVideoGet(source=0):
                     screen.blit(alt, (5, 130))
                     #screen.blit(bea, (5, 150))
                     screen.blit(spe, (5, 150))
-                    
+
                     cv2.putText(cam_out, now.strftime("%H:%M:%S"),(10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 3)
                     cv2.putText(cam_out, "Altitude: " + recv[2],(10, 430), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 0, 0), 3)
                     cv2.putText(cam_out, "Speed: " + recv[4],(10, 390), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 0, 0), 3)
