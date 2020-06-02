@@ -17,7 +17,7 @@ class VideoGet:
 		return self
 
 	def get(self):
-		self.timestr = time.strftime("%d%m%Y-%H%M%S")
+		self.timestr = time.strftime("%d%:m%:Y-%H%:M%:S")
 		self.filename = 'video' + self.timestr + '.avi' # .avi .mp4
 		self.fps = 15.0
 		self.video_writer = cv2.VideoWriter_fourcc('M','J','P','G')
