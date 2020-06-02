@@ -21,7 +21,7 @@ class VideoGet:
 		self.filename = 'video' + self.timestr + '.avi' # .avi .mp4
 		self.fps = 15.0
 		self.video_writer = cv2.VideoWriter_fourcc('M','J','P','G')
-		self.video_out = cv2.VideoWriter(self.filename, self.video_writer, self.fps, (1920, 1080))
+		self.video_out = cv2.VideoWriter(self.filename, self.video_writer, self.fps, (640, 480))
 		self.alpha = 0.5
 		while not self.stopped:
 			if not self.grabbed:
@@ -30,7 +30,7 @@ class VideoGet:
 				(self.grabbed, self.frame) = self.stream.read()
 				self.overlay = self.frame.copy()
 				self.timestr = time.strftime("%d%m%Y-%H%M%S")
-				cv2.putText(self.overlay, self.timestr, (10, 10), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 2)
+				cv2.putText(self.overlay, self.timestr, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 2)
 				# apply the overlay
 				cv2.addWeighted(self.overlay, self.alpha, self.frame, 1 - self.alpha, 0, self.frame)
 
