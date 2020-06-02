@@ -271,10 +271,13 @@ def threadVideoGet(source=0):
                        longitude = smallFont.render("LON: " + recv[1], True, (0, 0, 255))
                     if len(recv) > 3:
                        alt = smallFont.render("ALT: " + recv[2], True, (0, 0, 255))
+                       cv2.putText(cam_out, "Altitude: " + recv[2],(10, 430), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 0, 0), 3)
                     if len(recv) > 4:
                        bea = smallFont.render("BEA: " + recv[3], True, (0, 0, 255))
                     if len(recv) > 5:
                        spe = smallFont.render("SPE: " + recv[4], True, (0, 0, 255))
+                       cv2.putText(cam_out, "Speed: " + recv[4],(10, 390), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 0, 0), 3)
+
                     #lat = float(recv[0])
                     #lon = float(recv[1])
                     #speed = float(recv[4])
@@ -291,8 +294,6 @@ def threadVideoGet(source=0):
                     screen.blit(spe, (5, 150))
 
                     cv2.putText(cam_out, now.strftime("%H:%M:%S"),(10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 3)
-                    cv2.putText(cam_out, "Altitude: " + recv[2],(10, 430), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 0, 0), 3)
-                    cv2.putText(cam_out, "Speed: " + recv[4],(10, 390), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 0, 0), 3)
 
                     #if os.path.exists('/dev/ttyACM0') == True and var_set == True:
                     temp = medFont.render(tempF, True, (0, 0, 255))
