@@ -99,146 +99,7 @@ overlay_t = cv2.imread('therm.png', -1)
 thermometer = pygame.image.load('therm.png')
 thermometer = pygame.transform.rotozoom(thermometer, 0, 0.08)
 
-#firebase = firebase.FirebaseApplication('https://wear1-38901.firebaseio.com/')
-
-'''
-Tensorflow Code
-
-# Define VideoStream class to handle streaming of video from webcam in separate processing thread
-# Source - Adrian Rosebrock, PyImageSearch: https://www.pyimagesearch.com/2015/12/28/increasing-raspberry-pi-fps-with-python-and-opencv/
-class VideoStream:
-    """Camera object that controls video streaming from the Picamera"""
-    def __init__(self,resolution=(640,480),framerate=30):
-        # Initialize the PiCamera and the camera image stream
-        self.stream = cv2.VideoCapture(0)
-        ret = self.stream.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
-        ret = self.stream.set(3,resolution[0])
-        ret = self.stream.set(4,resolution[1])
-            
-        # Read first frame from the stream
-        (self.grabbed, self.frame) = self.stream.read()
-
-	# Variable to control when the camera is stopped
-        self.stopped = False
-
-    def start(self):
-	# Start the thread that reads frames from the video stream
-        Thread(target=self.update,args=()).start()
-        return self
-
-    def update(self):
-        # Keep looping indefinitely until the thread is stopped
-        while True:
-            # If the camera is stopped, stop the thread
-            if self.stopped:
-                # Close camera resources
-                self.stream.release()
-                return
-
-            # Otherwise, grab the next frame from the stream
-            (self.grabbed, self.frame) = self.stream.read()
-
-    def read(self):
-	# Return the most recent frame
-        return self.frame
-
-    def stop(self):
-	# Indicate that the camera and thread should be stopped
-        self.stopped = True
-
-# Define and parse input arguments
-parser = argparse.ArgumentParser()
-parser.add_argument('--modeldir', help='Folder the .tflite file is located in',
-                    required=True)
-parser.add_argument('--graph', help='Name of the .tflite file, if different than detect.tflite',
-                    default='detect.tflite')
-parser.add_argument('--labels', help='Name of the labelmap file, if different than labelmap.txt',
-                    default='labelmap.txt')
-parser.add_argument('--threshold', help='Minimum confidence threshold for displaying detected objects',
-                    default=0.5)
-parser.add_argument('--resolution', help='Desired webcam resolution in WxH. If the webcam does not support the resolution entered, errors may occur.',
-                    default='1280x720')
-parser.add_argument('--edgetpu', help='Use Coral Edge TPU Accelerator to speed up detection',
-                    action='store_true')
-
-args = parser.parse_args()
-
-MODEL_NAME = args.modeldir
-GRAPH_NAME = args.graph
-LABELMAP_NAME = args.labels
-min_conf_threshold = float(args.threshold)
-resW, resH = args.resolution.split('x')
-imW, imH = int(resW), int(resH)
-use_TPU = args.edgetpu
-
-# Import TensorFlow libraries
-# If tensorflow is not installed, import interpreter from tflite_runtime, else import from regular tensorflow
-# If using Coral Edge TPU, import the load_delegate library
-pkg = importlib.util.find_spec('tensorflow')
-if pkg is None:
-    from tflite_runtime.interpreter import Interpreter
-    if use_TPU:
-        from tflite_runtime.interpreter import load_delegate
-else:
-    from tensorflow.lite.python.interpreter import Interpreter
-    if use_TPU:
-        from tensorflow.lite.python.interpreter import load_delegate
-
-# If using Edge TPU, assign filename for Edge TPU model
-if use_TPU:
-    # If user has specified the name of the .tflite file, use that name, otherwise use default 'edgetpu.tflite'
-    if (GRAPH_NAME == 'detect.tflite'):
-        GRAPH_NAME = 'edgetpu.tflite'       
-
-# Get path to current working directory
-CWD_PATH = os.getcwd()
-
-# Path to .tflite file, which contains the model that is used for object detection
-PATH_TO_CKPT = os.path.join(CWD_PATH,MODEL_NAME,GRAPH_NAME)
-
-# Path to label map file
-PATH_TO_LABELS = os.path.join(CWD_PATH,MODEL_NAME,LABELMAP_NAME)
-
-# Load the label map
-with open(PATH_TO_LABELS, 'r') as f:
-    labels = [line.strip() for line in f.readlines()]
-
-# Have to do a weird fix for label map if using the COCO "starter model" from
-# https://www.tensorflow.org/lite/models/object_detection/overview
-# First label is '???', which has to be removed.
-if labels[0] == '???':
-    del(labels[0])
-
-# Load the Tensorflow Lite model.
-# If using Edge TPU, use special load_delegate argument
-if use_TPU:
-    interpreter = Interpreter(model_path=PATH_TO_CKPT,
-                              experimental_delegates=[load_delegate('libedgetpu.so.1.0')])
-    print(PATH_TO_CKPT)
-else:
-    interpreter = Interpreter(model_path=PATH_TO_CKPT)
-
-interpreter.allocate_tensors()
-
-# Get model details
-input_details = interpreter.get_input_details()
-output_details = interpreter.get_output_details()
-tf_height = input_details[0]['shape'][1]
-tf_width = input_details[0]['shape'][2]
-
-floating_model = (input_details[0]['dtype'] == np.float32)
-
-input_mean = 127.5
-input_std = 127.5
-
-# Initialize frame rate calculation
-frame_rate_calc = 1
-freq = cv2.getTickFrequency()
-
-
-End Tensorflow Code
-'''
-
+#firebase = firebase.FirebaseApplication('https://wear1-38901.firebaseio.com/')'
 
 #global connected
 #connected = False
@@ -359,6 +220,11 @@ def threadVideoGet(source=0):
 
         frames = []
 
+        check_usb = True
+        var_set = False
+        tempF = ""
+        bpm = ""
+
         # set SCALE
         J = 100000
         start = 0
@@ -369,7 +235,7 @@ def threadVideoGet(source=0):
                         break
                 frame = video_getter.frame
                 frame1 = frame.copy()
-                   
+
                 frame1=cv2.resize(frame1,None,fx=ds_factor,fy=ds_factor,interpolation=cv2.INTER_AREA)
                 gray=cv2.cvtColor(frame1,cv2.COLOR_BGR2GRAY)
                 ret, jpeg = cv2.imencode('.jpg', frame1)
@@ -381,57 +247,6 @@ def threadVideoGet(source=0):
                    bpm = "BPM: " + data[0]
                    tempF = "Temp: " + data[1][0:3] + " F"
 
-                '''
-                # Start timer (for calculating frame1 rate)
-                t1 = cv2.getTickCount()
-
-                frame1_rgb = cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB)
-                frame1_resized = cv2.resize(frame1_rgb, (tf_width, tf_height))
-                input_data = np.expand_dims(frame1_resized, axis=0)
-                
-                # Normalize pixel values if using a floating model (i.e. if model is non-quantized)
-                if floating_model:
-                    input_data = (np.float32(input_data) - input_mean) / input_std
-
-                # Perform the actual detection by running the model with the image as input
-                interpreter.set_tensor(input_details[0]['index'],input_data)
-                interpreter.invoke()
-
-                # Retrieve detection results
-                boxes = interpreter.get_tensor(output_details[0]['index'])[0] # Bounding box coordinates of detected objects
-                classes = interpreter.get_tensor(output_details[1]['index'])[0] # Class index of detected objects
-                scores = interpreter.get_tensor(output_details[2]['index'])[0] # Confidence of detected objects
-                #num = interpreter.get_tensor(output_details[3]['index'])[0]  # Total number of detected objects (inaccurate and not needed)
-
-                # Loop over all detections and draw detection box if confidence is above minimum threshold
-                for i in range(len(scores)):
-                    if ((scores[i] > min_conf_threshold) and (scores[i] <= 1.0)):
-
-                        # Get bounding box coordinates and draw box
-                        # Interpreter can return coordinates that are outside of image dimensions, need to force them to be within image using max() and min()
-                        ymin = int(max(1,(boxes[i][0] * imH)))
-                        xmin = int(max(1,(boxes[i][1] * imW)))
-                        ymax = int(min(imH,(boxes[i][2] * imH)))
-                        xmax = int(min(imW,(boxes[i][3] * imW)))
-            
-                        cv2.rectangle(frame1, (xmin,ymin), (xmax,ymax), (10, 255, 0), 2)
-
-                        # Draw label
-                        object_name = labels[int(classes[i])] # Look up object name from "labels" array using class index
-                        label = '%s: %d%%' % (object_name, int(scores[i]*100)) # Example: 'person: 72%'
-                        labelSize, baseLine = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2) # Get font size
-                        label_ymin = max(ymin, labelSize[1] + 10) # Make sure not to draw label too close to top of window
-                        cv2.rectangle(frame1, (xmin, label_ymin-labelSize[1]-10), (xmin+labelSize[0], label_ymin+baseLine-10), (255, 255, 255), cv2.FILLED) # Draw white box to put label text in
-                        cv2.putText(frame1, label, (xmin, label_ymin-7), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2) # Draw label text
-
-                # Draw framerate in corner of frame
-                #cv2.putText(frame,'FPS: {0:.2f}'.format(frame_rate_calc),(30,50),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,0),2,cv2.LINE_AA)
-                
-                # Calculate framerate
-                t2 = cv2.getTickCount()
-                time1 = (t2-t1)/freq
-                frame_rate_calc= 1/time1
-                '''
                 if main == True:
                     now = datetime.now()
                     #ret, frame = cap.read()
@@ -450,8 +265,6 @@ def threadVideoGet(source=0):
 
                     rec_button  = medFont.render("REC", True, rec_color)
                     #exit_button = medFont.render("Exit", True, (0, 255, 0))
-                    temp = medFont.render(tempF, True, (0, 0, 255))
-                    showBPM = medFont.render(bpm, True, (0, 0, 255))
                     if len(recv) > 1:
                        lattitude = smallFont.render("LAT: " + recv[0], True, (0, 0, 255))
                     if len(recv) > 2:
@@ -465,39 +278,12 @@ def threadVideoGet(source=0):
                     #lat = float(recv[0])
                     #lon = float(recv[1])
                     #speed = float(recv[4])
-                    '''
-                    pygame.draw.rect(screen,redColor,(156,116,10,10))
-                    if start < 4:
-                       A = lat
-                       B = lon
-                       pygame.draw.rect(screen, redColor,Rect((width/2)- 4,(height/2) - 4,100,50),2)
-                       start += 1
-                    if start == 4:
-                       #now = datetime.datetime.now()
-                       #timestamp = now.strftime("%y/%m/%d-%H:%M:%S")
-                       #timp = "TIME:, " + str(timestamp) + ", LAT:, " + str(lat) + ", LON:, " + str(lon) + ", SPEED:, " + str(speed) + ", ANGLE:, " + str(angle)  + "\n"
-                       #with open("/run/shm/log.txt", "a") as file:
-                       #   file.write(timp)
-                       start +=1
-                    else:
-                       start += 1
-                       X = lat
-                       Y = lon
-                       pygame.draw.rect(screen, redColor,Rect(((A-X)* J)+(width/2),((B-Y)*J)+ (height/2),10,10),2)
-                       #pygame.display.update()
-                       time.sleep(.25)
-                       pygame.draw.rect(screen, yellowColor,Rect(((A-X)* J)+(width/2),((B-Y)*J)+ (height/2),10,10),2)
-                       if oldX != 0:
-                          pygame.draw.line(screen, yellowColor,  (((A-oldX)* J)+(width/2),((B-oldY)*J)+ (height/2)), (((A-X)* J)+(width/2),((B-Y)*J)+ (height/2)))
-                    '''
-                    
+
                     #screen.fill((255, 149, 0))
                     screen.blit(clock, (190, 205))
                     screen.blit(rec_button, (270, 180))
                     #screen.blit(exit_button, (10,210))
                     #screen.blit(cam_button, (10,5))
-                    screen.blit(temp, (5, 205))
-                    screen.blit(showBPM, (5, 180))
                     #screen.blit(lattitude, (5, 90))
                     #screen.blit(longitude, (5, 110))
                     screen.blit(alt, (5, 130))
@@ -505,10 +291,16 @@ def threadVideoGet(source=0):
                     screen.blit(spe, (5, 150))
                     
                     cv2.putText(cam_out, now.strftime("%H:%M:%S"),(10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 3)
-                    cv2.putText(cam_out, tempF,(440, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 3)
-                    cv2.putText(cam_out, bpm,(10, 350), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
                     cv2.putText(cam_out, "Altitude: " + recv[2],(10, 430), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 0, 0), 3)
                     cv2.putText(cam_out, "Speed: " + recv[4],(10, 390), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 0, 0), 3)
+
+                    #if os.path.exists('/dev/ttyACM0') == True and var_set == True:
+                    temp = medFont.render(tempF, True, (0, 0, 255))
+                    showBPM = medFont.render(bpm, True, (0, 0, 255))
+                    screen.blit(temp, (5, 205))
+                    screen.blit(showBPM, (5, 180))
+                    cv2.putText(cam_out, tempF,(440, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 3)
+                    cv2.putText(cam_out, bpm,(10, 350), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
 
                     # apply the overlay
                     cv2.addWeighted(cam_out, alpha, output, 1 - alpha, 0, output)
@@ -523,8 +315,12 @@ def threadVideoGet(source=0):
                     frame1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB)
                     frame1 =  np.rot90(frame1)
                     frame1 = cv2.flip(frame1, 0)
+
+                    '''
+                    # Displays live camera output on screen
                     frame1 = pygame.surfarray.make_surface(frame1)
                     screen.blit(frame1, (80,5), (0, 0, 240, 160))
+                    '''
                     #screen.blit(image, (200, 300), (640,512,200,200))
 
                     #screen.blit(thermometer, (190,200))
@@ -568,7 +364,7 @@ def threadVideoGet(source=0):
                            frames = []
                            timestr = time.strftime("%Y%m%d-%H%M%S")
                            filename = 'video' + timestr + '.avi' # .avi .mp4
-                           fps = 5.0
+                           fps = 10.0
                            video_writer = cv2.VideoWriter_fourcc('M','J','P','G')
                            video_out = cv2.VideoWriter(filename, video_writer, fps, (640, 480))
                            rec_color = pygame.Color(255,  0, 0)
