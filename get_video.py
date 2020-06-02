@@ -29,7 +29,7 @@ class VideoGet:
 			else:
 				(self.grabbed, self.frame) = self.stream.read()
 				self.overlay = self.frame.copy()
-				self.timestr = time.strftime("%d%\/m%\/Y-%H%\:M%\:S")
+				self.timestr = time.strftime("%m/%d/%Y, %H:%M:%S")
 				cv2.putText(self.overlay, self.timestr, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 2)
 				# apply the overlay
 				cv2.addWeighted(self.overlay, self.alpha, self.frame, 1 - self.alpha, 0, self.frame)
