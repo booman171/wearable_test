@@ -228,6 +228,9 @@ bpm = ""
 J = 100000
 start = 0
 print("vfvdsvdF")
+
+video_getter = VideoGet(source).start()
+cps = CountsPerSec().start()
 while True:
         if (cv2.waitKey(15) == ord("q")) or video_getter.stopped:
                 video_getter.stop()
@@ -316,11 +319,11 @@ while True:
             frame1 =  np.rot90(frame1)
             frame1 = cv2.flip(frame1, 0)
 
-            '''
+            
             # Displays live camera output on screen
             frame1 = pygame.surfarray.make_surface(frame1)
             screen.blit(frame1, (80,5), (0, 0, 240, 160))
-            '''
+            
             #screen.blit(image, (200, 300), (640,512,200,200))
 
             #screen.blit(thermometer, (190,200))
