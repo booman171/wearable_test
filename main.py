@@ -139,6 +139,7 @@ def recvMSG():
 
 def sendMSG():
    global key
+   start = False
    key = 1
    while True:
       if GPIO.input(17) == False:
@@ -163,6 +164,17 @@ def sendMSG():
          client.send(send_data)
          time.sleep(0.5)
 
+      if GPIO.input(27) == False:
+         if start  == False:
+            send_data = "record" + "\r\n"
+            client.send(send_data)
+            start = True
+         elif start == True:
+            send_data = "stop" + "\r\n"
+            client.send(send_data)
+            start = False
+         time.sleep(0.5)
+
 #thread = threading.Thread(target=read_from_port)
 #thread.start()
 
@@ -184,7 +196,6 @@ showSensors = False
 #ser.readline()
 WHITE = (255, 255, 255)
 #mwboard = MWBoard()
-menu_key = 1
 menu_items = ["J", "Play/P", "Next", "Prev", "Vol+", "Vol-", "voice", "Back"]
 temperature = 0
 
@@ -200,8 +211,9 @@ time.sleep(1)
 '''
 Thread for getting video from get_video
 '''
-video_getter = VideoGet(source).start()
+#video_getter = VideoGet(source).start()
 global menu_key
+menu_key = 1
 record = False
 recording = False
 width = 320
@@ -229,8 +241,8 @@ J = 100000
 start = 0
 print("vfvdsvdF")
 
-video_getter = VideoGet(source).start()
-cps = CountsPerSec().start()
+video_getter = VideoGet(0).start()
+#cps = CountsPerSec().start()
 while True:
         if (cv2.waitKey(15) == ord("q")) or video_getter.stopped:
                 video_getter.stop()
@@ -312,9 +324,6 @@ while True:
             if connected == True:
                screen.blit(select_button, (5, 10))
 
-            if record == True:
-               video_out.write(output)
-
             frame1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB)
             frame1 =  np.rot90(frame1)
             frame1 = cv2.flip(frame1, 0)
@@ -355,21 +364,11 @@ while True:
             if GPIO.input(27) == False:
                 if record == True:
                    print("Recording stopped: " + str(record))
-                   rec_color = pygame.Color(0,255, 0)
                    record = False
-                   for num in frames:
-                       video_out.write(num)
-                   video_out.release()
                    rec_color = pygame.Color(255,255, 0)
                    time.sleep(0.5)
                 else:
                    print("Recording: " + str(record))
-                   frames = []
-                   timestr = time.strftime("%Y%m%d-%H%M%S")
-                   filename = 'video' + timestr + '.avi' # .avi .mp4
-                   fps = 5.0
-                   video_writer = cv2.VideoWriter_fourcc('M','J','P','G')
-                   video_out = cv2.VideoWriter(filename, video_writer, fps, (640, 480))
                    rec_color = pygame.Color(255,  0, 0)
                    record = True
                    time.sleep(0.5)
