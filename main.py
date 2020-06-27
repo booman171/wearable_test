@@ -5,7 +5,7 @@ from __future__ import absolute_import
 import threading
 import os
 import numpy as np
-import cv2
+#import cv2
 import time
 #import picamera
 import datetime as dt
@@ -33,6 +33,7 @@ from get_video import VideoGet
 from flask import Flask, render_template, Response
 import importlib.util
 from read_usb import readUSB
+
 
 #from sensor_serial import read_from_port
 #from metawear import MWBoard
@@ -136,6 +137,7 @@ def recvMSG():
       data = str(data,"utf-8")
       #print("Received: " + data)
       recv = data.split(",")
+      #recv = data
 
 def sendMSG():
    global key
@@ -208,9 +210,9 @@ ds_factor = 0.6
 time.sleep(1)
 
 #global frame
-'''
-Thread for getting video from get_video
-'''
+
+#Thread for getting video from get_video
+
 #video_getter = VideoGet(source).start()
 global menu_key
 menu_key = 1
@@ -223,7 +225,7 @@ blackColor =  pygame.Color(  0,  0, 0)
 yellowColor = pygame.Color(255,255, 0)
 redColor =    pygame.Color(255,  0, 0)
 greenColor =  pygame.Color(  0,255, 0)
-rec_color = pygame.Color(255,255, 0)
+rec_color = pygame.Color(255, 204, 51)
 
 alpha = 0.4
 oldX = 0
@@ -240,21 +242,17 @@ bpm = ""
 J = 100000
 start = 0
 print("vfvdsvdF")
-
-video_getter = VideoGet(0).start()
+#video_getter = VideoGet(0).start()
 #cps = CountsPerSec().start()
 while True:
-        if (cv2.waitKey(15) == ord("q")) or video_getter.stopped:
-                video_getter.stop()
-                break
-        frame = video_getter.frame
-        frame1 = frame.copy()
+        #frame = video_getter.frame
+        #frame1 = frame.copy()
 
-        frame1=cv2.resize(frame1,None,fx=ds_factor,fy=ds_factor,interpolation=cv2.INTER_AREA)
-        gray=cv2.cvtColor(frame1,cv2.COLOR_BGR2GRAY)
-        ret, jpeg = cv2.imencode('.jpg', frame1)
+        #frame1=cv2.resize(frame1,None,fx=ds_factor,fy=ds_factor,interpolation=cv2.INTER_AREA)
+        #gray=cv2.cvtColor(frame1,cv2.COLOR_BGR2GRAY)
+        #ret, jpeg = cv2.imencode('.jpg', frame1)
         #cv2.imshow("Video", frame1)
-        jpg = jpeg.tobytes()
+        #jpg = jpeg.tobytes()
 
         data = arduino1.getData().split(",")
         if len(arduino1.getData()) >= 2:
@@ -263,75 +261,75 @@ while True:
 
         if main == True:
             now = datetime.now()
+
             #ret, frame = cap.read()
-            cam_out = frame.copy()
-            output = frame.copy()
+            #cam_out = frame.copy()
+            #output = frame.copy()
 
             screen.fill([0,0,0])
 
-            bigFont = pygame.font.SysFont(None, 48)
+            pygame.draw.rect(screen, (194, 156, 43), (0,0,320,240), 5)
+            bigFont = pygame.font.SysFont(None, 66)
             medFont = pygame.font.SysFont(None, 32)
             smallFont = pygame.font.SysFont(None, 18)
-            clock = bigFont.render(now.strftime("%H:%M:%S"), True, (0, 255, 0))
+            clock = bigFont.render(now.strftime("%H:%M:%S"), True, (18, 122, 23))
             up_button = medFont.render("/\\", True,(0, 0, 255))
             down_button = medFont.render("\\/", True, (0, 0, 255))
-            select_button = medFont.render(menu_items[key], True, (0, 0, 255))
+            select_button = medFont.render(menu_items[key], True, (18, 122, 23))
 
             rec_button  = medFont.render("REC", True, rec_color)
-            #exit_button = medFont.render("Exit", True, (0, 255, 0))
-            if len(recv) > 1:
-               lattitude = smallFont.render("LAT: " + recv[0], True, (0, 0, 255))
-            if len(recv) > 2:
-               longitude = smallFont.render("LON: " + recv[1], True, (0, 0, 255))
-            if len(recv) > 3:
-               alt = smallFont.render("ALT: " + recv[2], True, (0, 0, 255))
-               cv2.putText(cam_out, "Altitude: " + recv[2],(10, 430), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 0, 0), 3)
-            if len(recv) > 4:
-               bea = smallFont.render("BEA: " + recv[3], True, (0, 0, 255))
-            if len(recv) > 5:
-               spe = smallFont.render("SPE: " + recv[4], True, (0, 0, 255))
-               cv2.putText(cam_out, "Speed: " + recv[4],(10, 390), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 0, 0), 3)
+            #exit_button = medFont.render("Exit", True, (0, 255, 0)
+            try:
+               if recv is not None:
+                  print(recv)
+                  if len(recv) > 1:
+                     act = medFont.render(recv[0], True, (255, 204, 51))
+                     screen.blit(act, (10, 125))
+                  if len(recv) > 2:
+                     timer = bigFont.render(recv[1], True, (255, 204, 51))
+                     screen.blit(timer, (10, 80))
+            except NameError:
+               print("recv not defined")
 
             #lat = float(recv[0])
             #lon = float(recv[1])
             #speed = float(recv[4])
 
             #screen.fill((255, 149, 0))
-            screen.blit(clock, (190, 205))
-            screen.blit(rec_button, (270, 180))
+            screen.blit(clock, (140, 5))
+            screen.blit(rec_button, (265, 210))
             #screen.blit(exit_button, (10,210))
             #screen.blit(cam_button, (10,5))
             #screen.blit(lattitude, (5, 90))
             #screen.blit(longitude, (5, 110))
-            screen.blit(alt, (5, 130))
+            #screen.blit(alt, (5, 130))
             #screen.blit(bea, (5, 150))
-            screen.blit(spe, (5, 150))
 
-            cv2.putText(cam_out, now.strftime("%H:%M:%S"),(10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 3)
+            #cv2.putText(cam_out, now.strftime("%H:%M:%S"),(10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 3)
 
             #if os.path.exists('/dev/ttyACM0') == True and var_set == True:
-            temp = medFont.render(tempF, True, (0, 0, 255))
-            showBPM = medFont.render(bpm, True, (0, 0, 255))
-            screen.blit(temp, (5, 205))
-            screen.blit(showBPM, (5, 180))
-            cv2.putText(cam_out, tempF,(440, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 3)
-            cv2.putText(cam_out, bpm,(10, 350), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
+            temp = medFont.render(tempF, True, (18, 122, 23))
+            #showBPM = medFont.render(bpm, True, (18, 122, 23))
+            screen.blit(temp, (5, 210))
+            #screen.blit(showBPM, (5, 180))
+            #cv2.putText(cam_out, tempF,(440, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 3)
+            #cv2.putText(cam_out, bpm,(10, 350), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
 
             # apply the overlay
-            cv2.addWeighted(cam_out, alpha, output, 1 - alpha, 0, output)
-            frames.append(output)
+            #cv2.addWeighted(cam_out, alpha, output, 1 - alpha, 0, output)
+            #frames.append(output)
 
             if connected == True:
                screen.blit(select_button, (5, 10))
 
-            frame1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB)
-            frame1 =  np.rot90(frame1)
-            frame1 = cv2.flip(frame1, 0)
+            #frame1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB)
+            #frame1 =  np.rot90(frame1)
+            #frame1 = cv2.flip(frame1, 0)
 
             
             # Displays live camera output on screen
-            frame1 = pygame.surfarray.make_surface(frame1)
-            screen.blit(frame1, (80,5), (0, 0, 240, 160))
+            #frame1 = pygame.surfarray.make_surface(frame1)
+            #screen.blit(frame1, (80,5), (0, 0, 240, 160))
             
             #screen.blit(image, (200, 300), (640,512,200,200))
 
@@ -375,3 +373,4 @@ while True:
         #yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + jpg + b'\r\n\r\n')
 
 
+'''
